@@ -46,17 +46,17 @@ const projects = [
 
 const hciScreenshots = [
   {
-    src: "/hci1.png",
+    src: `${import.meta.env.BASE_URL}hci1.png`,
     label: "Prototype screen 01",
     note: "Overall Figma layout of screens",
   },
   {
-    src: "/hci2.png",
+    src: `${import.meta.env.BASE_URL}hci2.png`,
     label: "Prototype screen 02",
     note: "Events Page",
   },
   {
-    src: "/hci3.png",
+    src: `${import.meta.env.BASE_URL}hci3.png`,
     label: "Prototype screen 03",
     note: "Home Page after syncing music",
   },
@@ -72,7 +72,12 @@ function GalleryLabel({ title, subtitle }) {
 }
 
 function Frame({ project, index, onOpen }) {
-  const frameImages = ["/frame1.png", "/frame2.png", "/frame3.png", "/frame4.png"];
+  const frameImages = [
+    `${import.meta.env.BASE_URL}frame1.png`,
+    `${import.meta.env.BASE_URL}frame2.png`,
+    `${import.meta.env.BASE_URL}frame3.png`,
+    `${import.meta.env.BASE_URL}frame4.png`,
+  ];
 
   const sizeClass = useMemo(() => {
     switch (project.size) {
@@ -639,7 +644,7 @@ function ShopCaseStudy({ onClose }) {
           <div className="rotate-1 rounded-sm border-[14px] border-neutral-950 bg-white p-4 shadow-2xl">
             <div className="overflow-hidden rounded-sm border border-neutral-200 bg-neutral-100">
               <img
-                src="/sbf.png"
+                src={`${import.meta.env.BASE_URL}sbf.png`}
                 alt="Studio by Fifi website preview"
                 className="h-[620px] w-full object-cover bg-white"
               />
@@ -722,7 +727,7 @@ function Entrance({ onEnter }) {
           className="group relative h-[460px] w-[280px] outline-none md:h-[520px] md:w-[320px]"
         >
           <img
-            src="/door.png"
+            src={`${import.meta.env.BASE_URL}door.png`}
             alt="Gallery Entrance Door"
             className="h-full w-full object-contain"
           />
@@ -764,7 +769,7 @@ function GalleryWalk({ onOpenProject }) {
               <div className="relative h-[520px] w-[400px] mx-auto">
                 {/* Frame */}
                 <img
-                  src="/frame-portrait.png"
+                  src={`${import.meta.env.BASE_URL}frame-portrait.png`}
                   className="absolute z-20 max-w-none object-fill pointer-events-none"
                   style={{
                     top: "-75px",
@@ -775,7 +780,7 @@ function GalleryWalk({ onOpenProject }) {
                 />
                 {/* Image inside frame */}
                 <img
-                  src="/bday.jpg"
+                  src={`${import.meta.env.BASE_URL}bday.jpg`}
                   className="absolute z-10 object-cover"
                   style={{
                     top: "28px",
