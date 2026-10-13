@@ -72,45 +72,40 @@ function WallFrame({ project, index, progress, onOpen, sizeClass, className = ""
 function Intro({ progress }) {
   const noteOpacity = useTransform(progress, [0, 0.08], [1, 0]);
   return (
-    <section className="relative flex min-h-screen w-screen items-center justify-center px-8 py-28 md:px-16 md:py-0">
-      <div className="grid w-full max-w-6xl grid-cols-1 items-center gap-16 md:grid-cols-[minmax(0,19rem)_1fr] md:gap-24">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto w-[16rem] -rotate-[0.6deg] md:w-[19rem]"
-        >
-          <div className="relative aspect-[4/5]">
-            <HangingWire drop={64} />
-            <SketchFrame variant="deep" seed={4} className="h-full w-full">
-              <img src={`${import.meta.env.BASE_URL}bday.jpg`} alt="Fiora Xu" className="h-full w-full object-cover" />
-            </SketchFrame>
+    <section className="relative flex min-h-screen w-screen items-center px-8 py-28 md:px-16 md:py-0">
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        className="mx-auto w-full max-w-5xl"
+      >
+        <Kicker>Portfolio</Kicker>
+        <h1 className="font-display mt-5 text-7xl font-light leading-[0.9] md:text-[9rem]">
+          Fiora <span className="italic">Xu</span>
+        </h1>
+        <div className="mt-10 grid grid-cols-1 gap-8 md:mt-14 md:grid-cols-[1fr_minmax(0,44rem)] md:gap-16">
+          <p className="whitespace-nowrap font-serif text-[13px] uppercase leading-7 tracking-[0.18em] text-pencil">
+            Computer Science
+            <br />
+            Human-Centered Computing
+            <br />
+            Northeastern University
+          </p>
+          <div>
+            <p className="font-serif text-[1.25rem] leading-[1.6] text-graphite md:text-[1.45rem]">
+              I’m Fiora Xu, a 21-year-old Computer Science major with a concentration in Human-Centered Computing at Northeastern University. I’m passionate about product management, UI/UX, product design, and quality assurance, with experience in QA and building web-based projects. I enjoy working at the intersection of design and functionality—thinking about how products not only work, but feel to use.
+            </p>
+            <p className="mt-8 font-serif text-[13px] uppercase tracking-[0.18em] text-pencil">
+              {["Product / PM", "UI/UX", "HCI", "Frontend", "Data Visualization"].join("  ·  ")}
+            </p>
+            <motion.div style={{ opacity: noteOpacity }} className="mt-12 hidden md:block">
+              <HandNote className="flex items-center gap-2">
+                keep scrolling to walk along the wall <ArrowRight size={18} strokeWidth={1.5} />
+              </HandNote>
+            </motion.div>
           </div>
-          <HandNote className="absolute -bottom-9 -right-2 rotate-[-4deg] text-accent">that’s me ↑</HandNote>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <Kicker>Portfolio</Kicker>
-          <h1 className="font-display mt-4 text-6xl font-light leading-[0.95] md:text-[6.5rem]">
-            Fiora <span className="italic">Xu</span>
-          </h1>
-          <p className="mt-7 max-w-[56ch] font-serif text-[1.2rem] leading-[1.65] text-graphite md:text-[1.3rem]">
-            I’m Fiora Xu, a 21-year-old Computer Science major with a concentration in Human-Centered Computing at Northeastern University. I’m passionate about product management, UI/UX, product design, and quality assurance, with experience in QA and building web-based projects. I enjoy working at the intersection of design and functionality—thinking about how products not only work, but feel to use.
-          </p>
-          <p className="mt-7 font-serif text-[13px] uppercase tracking-[0.18em] text-pencil">
-            {["Product / PM", "UI/UX", "HCI", "Frontend", "Data Visualization"].join("  ·  ")}
-          </p>
-          <motion.div style={{ opacity: noteOpacity }} className="mt-12 hidden md:block">
-            <HandNote className="flex items-center gap-2">
-              keep scrolling to walk along the wall <ArrowRight size={18} strokeWidth={1.5} />
-            </HandNote>
-          </motion.div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </section>
   );
 }
