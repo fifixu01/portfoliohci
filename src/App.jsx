@@ -1,21 +1,8 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import {
-  DoorOpen,
-  ArrowRight,
-  Sparkles,
-  Mail,
-  UserRound,
-  MapPin,
-  X,
-  Music,
-  Users,
-  MessageCircle,
-  CalendarDays,
-  ShieldCheck,
-  Lightbulb,
-  Gamepad2,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, X } from "lucide-react";
+import { Cover, HangingWire, SketchBox, SketchDefs, SketchFrame } from "./sketch.jsx";
+import { rng, roughLine } from "./rough.js";
 
 const projects = [
   {
@@ -23,24 +10,28 @@ const projects = [
     title: "Social Butterflies",
     subtitle: "HCI case study",
     size: "large",
+    frame: "ornate",
   },
   {
     id: "viz",
     title: "Data Visualization",
     subtitle: "Interactive storytelling",
     size: "medium",
+    frame: "matted",
   },
   {
     id: "web",
     title: "GameNite",
     subtitle: "Full-stack SWE project",
     size: "small",
+    frame: "classic",
   },
   {
-    id: "extra",
-    title: "Studio by Fifi",
-    subtitle: "Sticker shop + personal design",
+    id: "nb",
+    title: "Notability on Your Wrist",
+    subtitle: "Internal hackathon · 4th place",
     size: "mediumTall",
+    frame: "thin",
   },
 ];
 
@@ -62,153 +53,309 @@ const hciScreenshots = [
   },
 ];
 
-function GalleryLabel({ title, subtitle }) {
+const nbScreenshots = [
+  {
+    src: `${import.meta.env.BASE_URL}nb-watch-complications.png`,
+    label: "Watch-face complications",
+    note: "Create Note and Start Recording, one tap from the watch face",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}nb-watch-handoff.png`,
+    label: "Watch → iPhone handoff",
+    note: "Start recording on the watch opens a new note recording on the iPhone",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}nb-watch-solo.png`,
+    label: "Recording on the watch",
+    note: "If the iPhone app isn’t open, the watch records on its own and syncs later",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}nb-watch-help.png`,
+    label: "Get Help flow",
+    note: "First screen of filing a support request from the wrist",
+  },
+];
+
+// ---------- small shared pieces ----------
+
+function Eyebrow({ children, className = "" }) {
+  return <p className={`font-mono text-[11px] uppercase tracking-[0.28em] text-pencil ${className}`}>{children}</p>;
+}
+
+function HandNote({ children, className = "" }) {
+  return <p className={`font-hand text-2xl leading-none text-graphite ${className}`}>{children}</p>;
+}
+
+function Note({ title, label, seed, children }) {
   return (
-    <div className="mt-4 rounded-sm border border-neutral-300 bg-white/90 px-4 py-2 text-center shadow-sm">
-      <p className="font-serif text-sm tracking-wide text-neutral-900">{title}</p>
-      <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-neutral-500">{subtitle}</p>
-    </div>
+    <SketchBox seed={seed} className="bg-canvas/60 p-6">
+      {label && <Eyebrow className="mb-4">{label}</Eyebrow>}
+      <h3 className="font-serif text-3xl text-ink">{title}</h3>
+      <div className="mt-3 text-sm leading-7 text-graphite">{children}</div>
+    </SketchBox>
+  );
+}
+
+function Tag({ children, seed }) {
+  return (
+    <SketchBox as="span" seed={seed} faint className="inline-block px-3 py-1.5 font-mono text-xs text-graphite">
+      {children}
+    </SketchBox>
+  );
+}
+
+function InkLink({ href, children, variant = "solid", seed = 5 }) {
+  const solid = variant === "solid";
+  return (
+    <SketchBox
+      as="a"
+      seed={seed}
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className={`inline-flex w-fit items-center gap-3 px-6 py-3.5 font-mono text-xs uppercase tracking-[0.2em] transition hover:-translate-y-0.5 ${
+        solid ? "bg-ink text-canvas hover:bg-graphite" : "text-ink hover:bg-canvas"
+      }`}
+    >
+      {children} <ArrowUpRight size={16} strokeWidth={1.5} />
+    </SketchBox>
+  );
+}
+
+function PencilRule({ className = "" }) {
+  const d = useMemo(() => {
+    const r = rng(7);
+    return roughLine(0, 4, 1000, 4, r, { over: 0, wobble: 1.5 });
+  }, []);
+  return (
+    <svg className={`h-2 w-full overflow-visible ${className}`} viewBox="0 0 1000 8" preserveAspectRatio="none" aria-hidden="true">
+      <path d={d} fill="none" stroke="var(--ink)" strokeWidth="1" vectorEffect="non-scaling-stroke" opacity="0.6" />
+    </svg>
+  );
+}
+
+function GalleryLabel({ title, subtitle, index }) {
+  return (
+    <SketchBox seed={index + 40} faint className="mt-6 bg-canvas px-4 py-2.5 text-center">
+      <p className="font-serif text-lg leading-tight text-ink">{title}</p>
+      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-pencil">
+        No. 0{index + 1} — {subtitle}
+      </p>
+    </SketchBox>
   );
 }
 
 function Frame({ project, index, onOpen }) {
-  const frameImages = [
-    `${import.meta.env.BASE_URL}frame1.png`,
-    `${import.meta.env.BASE_URL}frame2.png`,
-    `${import.meta.env.BASE_URL}frame3.png`,
-    `${import.meta.env.BASE_URL}frame4.png`,
-  ];
-
   const sizeClass = useMemo(() => {
     switch (project.size) {
       case "large":
-        return "h-80 w-72 md:h-[26rem] md:w-96";
+        return "h-80 w-64 md:h-[24rem] md:w-80";
       case "mediumTall":
-        return "h-80 w-56 md:h-[24rem] md:w-72";
+        return "h-80 w-56 md:h-[22rem] md:w-64";
       case "medium":
-        return "h-64 w-64 md:h-80 md:w-80";
+        return "h-64 w-64 md:h-72 md:w-72";
       default:
-        return "h-52 w-64 md:h-64 md:w-80";
+        return "h-52 w-64 md:h-60 md:w-80";
     }
   }, [project.size]);
 
   return (
     <motion.button
       type="button"
-      initial={{ opacity: 0, y: 40, rotate: index % 2 === 0 ? -1.5 : 1.5 }}
+      initial={{ opacity: 0, y: 30, rotate: index % 2 === 0 ? -1.2 : 1.2 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.4, delay: index * 0.06 }}  // slightly faster load
-      whileHover={{ y: -12, scale: 1.05, rotate: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.06 }}
+      whileHover={{ y: -8, rotate: 0 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => onOpen(project)}
       className="group flex flex-col items-center outline-none"
     >
-      <div className={`${sizeClass} relative overflow-visible drop-shadow-2xl transition group-hover:drop-shadow-[0_30px_45px_rgba(0,0,0,0.35)]`}>
-       <img
-          src={frameImages[index]}
-          alt={project.title}
-          className="h-full w-full object-contain"
-          style={{
-            transform: index === 2 ? "scale(1.08)" : "scale(1)",
-          }}
-        />
+      <div className={`${sizeClass} relative`}>
+        <HangingWire />
+        <SketchFrame variant={project.frame} seed={index * 13 + 3} className="h-full w-full">
+          <div className="h-full w-full p-3 transition duration-500 group-hover:scale-[1.03]">
+            <Cover id={project.id} />
+          </div>
+        </SketchFrame>
       </div>
 
-      <GalleryLabel title={project.title} subtitle={project.subtitle} />
+      <GalleryLabel title={project.title} subtitle={project.subtitle} index={index} />
     </motion.button>
   );
 }
 
-function HciCaseStudy({ onClose }) {
-  const [expandedImage, setExpandedImage] = useState(null);
+// ---------- case study shell ----------
 
+function CaseStudyShell({ eyebrow, title, onClose, children }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] overflow-y-auto bg-[#f6f3ed] text-neutral-950"
+      className="fixed inset-0 z-[100] overflow-y-auto bg-paper text-ink"
     >
-      <div className="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 px-5 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+      <div className="sticky top-0 z-50 bg-paper/90 px-5 pt-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 pb-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-neutral-500">Featured Exhibition</p>
-            <h1 className="font-serif text-2xl text-neutral-950 md:text-4xl">Social Butterflies</h1>
+            <Eyebrow>{eyebrow}</Eyebrow>
+            <h1 className="mt-1 font-serif text-2xl text-ink md:text-4xl">{title}</h1>
           </div>
-          <button
+          <SketchBox
+            as="button"
+            seed={9}
             onClick={onClose}
-            className="rounded-full border border-neutral-300 bg-white p-3 shadow-sm transition hover:bg-neutral-100"
-            aria-label="Close case study"
+            className="flex items-center gap-2 px-4 py-2.5 font-mono text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-canvas"
+            aria-label={`Close ${title}`}
           >
-            <X size={20} />
-          </button>
+            <X size={16} strokeWidth={1.5} /> Back
+          </SketchBox>
         </div>
+        <PencilRule className="mx-auto max-w-7xl" />
       </div>
+      {children}
+    </motion.div>
+  );
+}
 
-      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-12 md:grid-cols-[0.9fr_1.1fr] md:py-16">
-        <div className="rounded-sm border-[14px] border-neutral-950 bg-white p-4 shadow-2xl">
-          <div className="flex min-h-[420px] items-center justify-center rounded-sm bg-gradient-to-br from-pink-50 via-orange-50 to-yellow-50 p-8 text-center">
-            <div>
-              <Music className="mx-auto mb-6" size={54} />
-              <p className="font-serif text-5xl italic leading-tight text-neutral-950">Bridging the Gap</p>
-              <p className="mx-auto mt-5 max-w-md text-sm leading-6 text-neutral-600">
-                Designing safe entry points for Northeastern students to move from shared interests to comfortable in-person connection.
-              </p>
+function LivePreview({ src, title, caption, note, heightClass, seed }) {
+  return (
+    <div>
+      <SketchFrame variant="thin" seed={seed}>
+        <iframe src={src} title={title} className={`${heightClass} w-full bg-white`} />
+      </SketchFrame>
+      <div className="mt-4 text-center">
+        <p className="font-serif text-lg text-ink">{caption}</p>
+        <Eyebrow className="mt-1 normal-case tracking-[0.1em]">{note}</Eyebrow>
+      </div>
+    </div>
+  );
+}
+
+function ScreenshotGrid({ shots, seedBase, onExpand, cols = "md:grid-cols-3", aspect = "aspect-[4/3]", fit = "object-cover" }) {
+  return (
+    <div className={`grid grid-cols-1 gap-10 ${cols}`}>
+      {shots.map((shot, i) => (
+        <figure key={shot.src}>
+          <button type="button" onClick={() => onExpand(shot)} className="group block w-full outline-none">
+            <SketchFrame variant="thin" seed={i + seedBase} className={`${aspect} w-full transition duration-300 group-hover:-translate-y-1`}>
+              <img
+                src={shot.src}
+                alt={shot.label}
+                className={`h-full w-full bg-white ${fit}`}
+                onError={(event) => {
+                  event.currentTarget.style.display = "none";
+                }}
+              />
+            </SketchFrame>
+          </button>
+          <figcaption className="mt-4 text-center">
+            <p className="font-serif text-lg text-ink">{shot.label}</p>
+            <p className="mt-1 text-xs text-pencil">{shot.note}</p>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  );
+}
+
+function ImageLightbox({ image, onClose }) {
+  return (
+    <AnimatePresence>
+      {image && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-ink/85 p-6"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.95, y: 16 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.95, y: 16 }}
+            className="relative max-h-[90vh] w-full max-w-6xl bg-canvas p-4"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              onClick={onClose}
+              className="absolute right-4 top-4 z-10 bg-canvas p-2.5 text-ink transition hover:bg-paper"
+              aria-label="Close expanded image"
+            >
+              <X size={20} strokeWidth={1.5} />
+            </button>
+            <img src={image.src} alt={image.label} className="max-h-[80vh] w-full object-contain" />
+            <p className="mt-3 text-center font-serif text-lg text-ink">{image.label}</p>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ---------- case studies ----------
+
+function HciCaseStudy({ onClose }) {
+  const [expandedImage, setExpandedImage] = useState(null);
+
+  return (
+    <CaseStudyShell eyebrow="Featured Exhibition" title="Social Butterflies" onClose={onClose}>
+      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 py-12 md:grid-cols-[0.9fr_1.1fr] md:py-16">
+        <SketchFrame variant="ornate" seed={21} className="h-[460px]">
+          <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+            <div className="h-40 w-40">
+              <Cover id="hci" />
             </div>
+            <p className="mt-4 font-serif text-5xl italic leading-tight text-ink">Bridging the Gap</p>
+            <p className="mx-auto mt-5 max-w-md text-sm leading-6 text-graphite">
+              Designing safe entry points for Northeastern students to move from shared interests to comfortable in-person connection.
+            </p>
           </div>
-        </div>
+        </SketchFrame>
 
         <div className="flex flex-col justify-center">
-          <p className="mb-4 text-xs uppercase tracking-[0.35em] text-neutral-500">HCI Course Project</p>
-          <h2 className="font-serif text-5xl leading-tight text-neutral-950 md:text-7xl">
+          <Eyebrow className="mb-4">HCI Course Project</Eyebrow>
+          <h2 className="font-serif text-5xl leading-[1.05] text-ink md:text-7xl">
             A music-based app for low-pressure social connection.
           </h2>
-          <p className="mt-7 text-lg leading-8 text-neutral-700">
+          <p className="mt-7 text-lg leading-8 text-graphite">
             Social Butterflies explored how Northeastern students can turn shared music interests, communities, and concerts into safer in-person connection. The main insight was that many students are not lacking opportunities to meet people; they lack clear, socially safe signals that make initiating feel mutual instead of awkward or one-sided.
           </p>
-          <div className="mt-8 grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
-            {["Needfinding", "Personas", "Lo-fi Prototype", "Hi-fi Prototype"].map((item) => (
-              <div key={item} className="rounded-sm border border-neutral-300 bg-white p-4 text-center shadow-sm">
-                {item}
-              </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            {["Needfinding", "Personas", "Lo-fi Prototype", "Hi-fi Prototype"].map((item, i) => (
+              <Tag key={item} seed={i + 60}>{item}</Tag>
             ))}
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-8">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {[
             {
-              icon: Users,
               title: "Problem",
               text: "Students wanted meaningful friendships but hesitated to initiate because they feared awkwardness, rejection, or misreading intentions.",
             },
             {
-              icon: Lightbulb,
               title: "Core Insight",
               text: "The barrier was not simply loneliness or lack of events. It was social ambiguity: not knowing whether another person was open to the same level of connection.",
             },
             {
-              icon: ShieldCheck,
               title: "Design Goal",
               text: "Create structured signals of openness through music interests, communities, friendship levels, and safer meetup planning.",
             },
-          ].map((card) => (
-            <div key={card.title} className="rounded-sm border border-neutral-300 bg-white p-6 shadow-sm">
-              <card.icon className="mb-5" size={30} />
-              <h3 className="font-serif text-2xl text-neutral-950">{card.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-neutral-650">{card.text}</p>
-            </div>
+          ].map((card, i) => (
+            <Note key={card.title} title={card.title} label={`Note ${String.fromCharCode(65 + i)}`} seed={i + 70}>
+              {card.text}
+            </Note>
           ))}
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-12">
         <div className="mb-8">
-          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-neutral-500">Process Wall</p>
-          <h2 className="font-serif text-5xl text-neutral-950">From research to prototype</h2>
+          <Eyebrow className="mb-3">Process Wall</Eyebrow>
+          <h2 className="font-serif text-5xl text-ink">From research to prototype</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -244,196 +391,100 @@ function HciCaseStudy({ onClose }) {
               text: "Participants completed the major tasks successfully, but testing revealed confusion around edit/save behavior, community posting after joining, and navigation between profile/settings. These became clear future improvement directions.",
             },
           ].map((item) => (
-            <div key={item.step} className="rounded-sm border border-neutral-300 bg-white p-7 shadow-sm">
-              <p className="mb-3 text-xs uppercase tracking-[0.35em] text-neutral-400">Step {item.step}</p>
-              <h3 className="font-serif text-3xl text-neutral-950">{item.title}</h3>
-              <p className="mt-4 text-sm leading-7 text-neutral-700">{item.text}</p>
-            </div>
+            <Note key={item.step} title={item.title} label={`Step ${item.step}`} seed={Number(item.step) + 80}>
+              {item.text}
+            </Note>
           ))}
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-12">
-        <div className="mb-8">
-          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-neutral-500">Prototype Screens</p>
-          <h2 className="font-serif text-5xl text-neutral-950">Visual evidence</h2>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-neutral-600">
-            Click on the photos to further expand them.
-          </p>
+        <div className="mb-10">
+          <Eyebrow className="mb-3">Prototype Screens</Eyebrow>
+          <h2 className="font-serif text-5xl text-ink">Visual evidence</h2>
+          <HandNote className="mt-3">click a screen to look closer ↓</HandNote>
         </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {hciScreenshots.map((shot) => (
-            <figure key={shot.src} className="rounded-sm border-[10px] border-neutral-950 bg-white p-3 shadow-2xl">
-              <button
-                type="button"
-                onClick={() => setExpandedImage(shot)}
-                className="group aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-100 outline-none transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-              >
-                <img
-                  src={shot.src}
-                  alt={shot.label}
-                  className="h-full w-full object-cover"
-                  onError={(event) => {
-                    event.currentTarget.style.display = "none";
-                  }}
-                />
-              </button>
-              <figcaption className="mt-4 rounded-sm border border-neutral-200 bg-white px-3 py-2 text-center">
-                <p className="font-serif text-sm text-neutral-950">{shot.label}</p>
-                <p className="mt-1 text-xs text-neutral-500">{shot.note}</p>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
+        <ScreenshotGrid shots={hciScreenshots} seedBase={90} onExpand={setExpandedImage} />
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="rounded-sm border border-neutral-300 bg-white p-8 shadow-sm">
-            <MessageCircle className="mb-5" size={32} />
-            <h3 className="font-serif text-4xl text-neutral-950">Key features</h3>
-            <ul className="mt-6 space-y-4 text-sm leading-7 text-neutral-700">
-              <li><strong>Music syncing:</strong> helps users express taste without starting from nothing.</li>
-              <li><strong>Communities:</strong> lets users engage around shared interests before one-on-one messaging.</li>
-              <li><strong>Friendship levels:</strong> makes connection strength more visible and less ambiguous.</li>
-              <li><strong>Quick messages:</strong> lowers the effort of starting a conversation.</li>
-              <li><strong>Meetup suggestions:</strong> connects people through shared concerts and events.</li>
+          <Note title="Key features" label="Features" seed={101}>
+            <ul className="mt-3 space-y-3">
+              <li><strong className="font-medium text-ink">Music syncing:</strong> helps users express taste without starting from nothing.</li>
+              <li><strong className="font-medium text-ink">Communities:</strong> lets users engage around shared interests before one-on-one messaging.</li>
+              <li><strong className="font-medium text-ink">Friendship levels:</strong> makes connection strength more visible and less ambiguous.</li>
+              <li><strong className="font-medium text-ink">Quick messages:</strong> lowers the effort of starting a conversation.</li>
+              <li><strong className="font-medium text-ink">Meetup suggestions:</strong> connects people through shared concerts and events.</li>
             </ul>
-          </div>
+          </Note>
 
-          <div className="rounded-sm border border-neutral-300 bg-white p-8 shadow-sm">
-            <CalendarDays className="mb-5" size={32} />
-            <h3 className="font-serif text-4xl text-neutral-950">Future improvements</h3>
-            <ul className="mt-6 space-y-4 text-sm leading-7 text-neutral-700">
+          <Note title="Future improvements" label="Next" seed={102}>
+            <ul className="mt-3 list-['–_'] space-y-3 pl-4">
               <li>Make the home page more distinct from the profile page with more personalized content.</li>
               <li>Clarify what friendship levels mean and how users progress through them.</li>
               <li>Add onboarding so first-time users understand profile setup, communities, messaging, and meetups.</li>
               <li>Improve feedback after joining communities or adding events so the user knows the action worked.</li>
               <li>Test with more skeptical users and run longer-term studies to see whether the app actually supports real-world connection.</li>
             </ul>
-          </div>
+          </Note>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="rounded-sm border border-neutral-300 bg-neutral-950 p-8 text-white shadow-2xl md:p-12">
-          <p className="mb-4 text-xs uppercase tracking-[0.35em] text-white/50">Reflection</p>
+        <SketchBox seed={110} className="bg-ink p-8 text-canvas md:p-12">
+          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-canvas/50">Reflection</p>
           <h2 className="font-serif text-5xl">What I learned</h2>
-          <p className="mt-6 max-w-4xl text-base leading-8 text-white/75">
+          <p className="mt-6 max-w-4xl text-base leading-8 text-canvas/75">
             This project changed how I think about designing for social interaction. Awkwardness is not just a personal weakness or lack of confidence; it often comes from uncertainty, safety concerns, and the hidden work of reading another person’s intentions. A stronger design does not only create more opportunities to meet people. It makes the first step feel clearer, safer, and more mutual.
           </p>
-        </div>
+        </SketchBox>
       </section>
 
-      <AnimatePresence>
-        {expandedImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm"
-            onClick={() => setExpandedImage(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.92, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.92, y: 20 }}
-              className="relative max-h-[90vh] w-full max-w-6xl rounded-sm bg-white p-4 shadow-2xl"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <button
-                onClick={() => setExpandedImage(null)}
-                className="absolute right-4 top-4 z-10 rounded-full bg-white/90 p-3 shadow-lg transition hover:bg-neutral-100"
-                aria-label="Close expanded image"
-              >
-                <X size={20} />
-              </button>
-              <img
-                src={expandedImage.src}
-                alt={expandedImage.label}
-                className="max-h-[80vh] w-full rounded-sm object-contain"
-              />
-              <p className="mt-3 text-center font-serif text-lg text-neutral-900">{expandedImage.label}</p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+      <ImageLightbox image={expandedImage} onClose={() => setExpandedImage(null)} />
+    </CaseStudyShell>
   );
 }
 
 function VizCaseStudy({ onClose }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] overflow-y-auto bg-[#f6f3ed] text-neutral-950"
-    >
-      <div className="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 px-5 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-neutral-500">Project Exhibition</p>
-            <h1 className="font-serif text-2xl text-neutral-950 md:text-4xl">MBTA Data Visualization</h1>
-          </div>
-          <button
-            onClick={onClose}
-            className="rounded-full border border-neutral-300 bg-white p-3 shadow-sm transition hover:bg-neutral-100"
-            aria-label="Close data visualization case study"
-          >
-            <X size={20} />
-          </button>
-        </div>
-      </div>
-
-      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-12 md:grid-cols-[1.2fr_0.8fr] md:py-16">
-        <div className="rounded-sm border-[14px] border-neutral-950 bg-white p-4 shadow-2xl">
-          <div className="overflow-hidden rounded-sm border border-neutral-200 bg-neutral-100">
-            <iframe
-              src="https://fifixu01.github.io/ds4200FinalProject/"
-              title="MBTA Data Visualization Website Preview"
-              className="h-[520px] w-full bg-white"
-            />
-          </div>
-          <div className="mt-4 rounded-sm border border-neutral-200 bg-white px-4 py-3 text-center">
-            <p className="font-serif text-sm text-neutral-950">Live Website Preview</p>
-            <p className="mt-1 text-xs text-neutral-500">Interactive MBTA ridership project embedded from GitHub Pages</p>
-          </div>
-        </div>
+    <CaseStudyShell eyebrow="Project Exhibition" title="MBTA Data Visualization" onClose={onClose}>
+      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 py-12 md:grid-cols-[1.2fr_0.8fr] md:py-16">
+        <LivePreview
+          src="https://fifixu01.github.io/ds4200FinalProject/"
+          title="MBTA Data Visualization Website Preview"
+          caption="Live Website Preview"
+          note="Interactive MBTA ridership project embedded from GitHub Pages"
+          heightClass="h-[520px]"
+          seed={120}
+        />
 
         <div className="flex flex-col justify-center">
-          <p className="mb-4 text-xs uppercase tracking-[0.35em] text-neutral-500">DS4200 Data Science Project</p>
-          <h2 className="font-serif text-5xl leading-tight text-neutral-950 md:text-6xl">
+          <Eyebrow className="mb-4">DS4200 Data Science Project</Eyebrow>
+          <h2 className="font-serif text-5xl leading-[1.05] text-ink md:text-6xl">
             Exploring MBTA ridership through interactive visuals.
           </h2>
-          <p className="mt-7 text-lg leading-8 text-neutral-700">
+          <p className="mt-7 text-lg leading-8 text-graphite">
             This project analyzes MBTA ridership data through a web-based data visualization story. We cleaned and prepared the dataset, then created six interactive visualizations to help viewers explore patterns in public transportation usage.
           </p>
-          <p className="mt-5 text-base leading-7 text-neutral-700">
+          <p className="mt-5 text-base leading-7 text-graphite">
             The goal was to make the data easier to understand by turning raw ridership numbers into visual comparisons, trends, and interactive views. The final result was deployed as a public website so users can directly explore the visualizations.
           </p>
 
-          <div className="mt-8 grid grid-cols-2 gap-3 text-sm">
-            {["Data Cleaning", "6 Visualizations", "Interactive Website", "GitHub Pages"].map((item) => (
-              <div key={item} className="rounded-sm border border-neutral-300 bg-white p-4 text-center shadow-sm">
-                {item}
-              </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            {["Data Cleaning", "6 Visualizations", "Interactive Website", "GitHub Pages"].map((item, i) => (
+              <Tag key={item} seed={i + 130}>{item}</Tag>
             ))}
           </div>
 
-          <a
-            href="https://fifixu01.github.io/ds4200FinalProject/"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-8 inline-flex w-fit items-center gap-3 rounded-full bg-neutral-950 px-7 py-4 text-sm font-medium text-white shadow-xl transition hover:-translate-y-1 hover:bg-neutral-800"
-          >
-            Open Full Website <ArrowRight size={18} />
-          </a>
+          <div className="mt-8">
+            <InkLink href="https://fifixu01.github.io/ds4200FinalProject/">Open Full Website</InkLink>
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-8">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+      <section className="mx-auto max-w-7xl px-6 pb-16 pt-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {[
             {
               title: "Project Goal",
@@ -447,95 +498,57 @@ function VizCaseStudy({ onClose }) {
               title: "Design Focus",
               text: "The website emphasizes readability, interaction, and visual hierarchy so that the data feels approachable instead of overwhelming.",
             },
-          ].map((card) => (
-            <div key={card.title} className="rounded-sm border border-neutral-300 bg-white p-6 shadow-sm">
-              <Sparkles className="mb-5" size={30} />
-              <h3 className="font-serif text-2xl text-neutral-950">{card.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-neutral-700">{card.text}</p>
-            </div>
+          ].map((card, i) => (
+            <Note key={card.title} title={card.title} label={`Note ${String.fromCharCode(65 + i)}`} seed={i + 140}>
+              {card.text}
+            </Note>
           ))}
         </div>
       </section>
-    </motion.div>
+    </CaseStudyShell>
   );
 }
 
 function WebCaseStudy({ onClose }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] overflow-y-auto bg-[#f6f3ed] text-neutral-950"
-    >
-      <div className="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 px-5 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-neutral-500">Project Exhibition</p>
-            <h1 className="font-serif text-2xl text-neutral-950 md:text-4xl">GameNite</h1>
-          </div>
-          <button
-            onClick={onClose}
-            className="rounded-full border border-neutral-300 bg-white p-3 shadow-sm transition hover:bg-neutral-100"
-            aria-label="Close GameNite case study"
-          >
-            <X size={20} />
-          </button>
-        </div>
-      </div>
-
+    <CaseStudyShell eyebrow="Project Exhibition" title="GameNite" onClose={onClose}>
       <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
         <div className="mb-10">
-          <p className="mb-4 text-xs uppercase tracking-[0.35em] text-neutral-500">
-            Software Engineering Project
-          </p>
-          <h2 className="max-w-5xl font-serif text-5xl leading-tight text-neutral-950 md:text-7xl">
+          <Eyebrow className="mb-4">Software Engineering Project</Eyebrow>
+          <h2 className="max-w-5xl font-serif text-5xl leading-[1.05] text-ink md:text-7xl">
             A full-stack community and multiplayer game platform.
           </h2>
-          <p className="mt-7 max-w-4xl text-lg leading-8 text-neutral-700">
+          <p className="mt-7 max-w-4xl text-lg leading-8 text-graphite">
             GameNite was built for my software engineering class as a real working web application, not just a static prototype. The site supports user accounts, forums that work across multiple users, community interaction, and multiplayer game features. This project helped me practice building a larger full-stack system with frontend UI, backend logic, authentication, persistent data, and real-time interaction.
           </p>
         </div>
 
-        <div className="mb-10 rounded-sm border border-neutral-300 bg-white p-6 shadow-xl">
-          <div className="flex items-start gap-4">
-            <Gamepad2 className="mt-1 shrink-0" size={32} />
-            <div>
-              <h3 className="font-serif text-3xl text-neutral-950">Test Login</h3>
-              <p className="mt-3 text-sm leading-7 text-neutral-700">
-                If you want to test the website, use these credentials:
-              </p>
-              <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
-                <div className="rounded-sm border border-neutral-300 bg-neutral-50 p-4">
-                  <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">Username</p>
-                  <p className="mt-2 font-mono text-lg text-neutral-950">user0</p>
-                </div>
-                <div className="rounded-sm border border-neutral-300 bg-neutral-50 p-4">
-                  <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">Password</p>
-                  <p className="mt-2 font-mono text-lg text-neutral-950">pwd0000</p>
-                </div>
-              </div>
-            </div>
+        <SketchBox seed={150} className="mb-12 bg-canvas/60 p-6">
+          <Eyebrow>Test Login</Eyebrow>
+          <p className="mt-3 text-sm leading-7 text-graphite">If you want to test the website, use these credentials:</p>
+          <div className="mt-4 grid gap-4 text-sm md:grid-cols-2">
+            {[
+              ["Username", "user0"],
+              ["Password", "pwd0000"],
+            ].map(([k, v], i) => (
+              <SketchBox key={k} seed={151 + i} faint className="p-4">
+                <Eyebrow>{k}</Eyebrow>
+                <p className="mt-2 font-mono text-lg text-ink">{v}</p>
+              </SketchBox>
+            ))}
           </div>
-        </div>
+        </SketchBox>
 
-        <div className="rounded-sm border-[14px] border-neutral-950 bg-white p-4 shadow-2xl">
-          <div className="overflow-hidden rounded-sm border border-neutral-200 bg-neutral-100">
-            <iframe
-              src="https://spring26-project-spring26-project-group-sdc3.onrender.com/login"
-              title="GameNite Website Preview"
-              className="h-[620px] w-full bg-white"
-            />
-          </div>
-          <div className="mt-4 rounded-sm border border-neutral-200 bg-white px-4 py-3 text-center">
-            <p className="font-serif text-sm text-neutral-950">Live Website Preview</p>
-            <p className="mt-1 text-xs text-neutral-500">
-              Full-stack deployed app with accounts, forums, and multiplayer game features
-            </p>
-          </div>
-        </div>
+        <LivePreview
+          src="https://spring26-project-spring26-project-group-sdc3.onrender.com/login"
+          title="GameNite Website Preview"
+          caption="Live Website Preview"
+          note="Full-stack deployed app with accounts, forums, and multiplayer game features"
+          heightClass="h-[620px]"
+          seed={155}
+        />
 
-        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
           {[
             {
               title: "Full-Stack App",
@@ -549,139 +562,177 @@ function WebCaseStudy({ onClose }) {
               title: "Multiplayer Focus",
               text: "The project also supports multiplayer game interaction, connecting the social/community side of the app with actual play experiences.",
             },
-          ].map((card) => (
-            <div key={card.title} className="rounded-sm border border-neutral-300 bg-white p-6 shadow-sm">
-              <Sparkles className="mb-5" size={30} />
-              <h3 className="font-serif text-2xl text-neutral-950">{card.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-neutral-700">{card.text}</p>
-            </div>
+          ].map((card, i) => (
+            <Note key={card.title} title={card.title} label={`Note ${String.fromCharCode(65 + i)}`} seed={i + 160}>
+              {card.text}
+            </Note>
           ))}
         </div>
 
-        <a
-          href="https://spring26-project-spring26-project-group-sdc3.onrender.com/login"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-10 inline-flex w-fit items-center gap-3 rounded-full bg-neutral-950 px-7 py-4 text-sm font-medium text-white shadow-xl transition hover:-translate-y-1 hover:bg-neutral-800"
-        >
-          Open Full Website <ArrowRight size={18} />
-        </a>
+        <div className="mt-10">
+          <InkLink href="https://spring26-project-spring26-project-group-sdc3.onrender.com/login">Open Full Website</InkLink>
+        </div>
       </section>
-    </motion.div>
+    </CaseStudyShell>
   );
 }
 
-function ShopCaseStudy({ onClose }) {
+function NotabilityCaseStudy({ onClose }) {
+  const [expandedImage, setExpandedImage] = useState(null);
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] overflow-y-auto bg-[#fff7f1] text-neutral-950"
-    >
-      <div className="sticky top-0 z-50 border-b border-orange-100 bg-white/80 px-5 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-neutral-500">Personal Exhibition</p>
-            <h1 className="font-serif text-2xl text-neutral-950 md:text-4xl">Studio by Fifi</h1>
+    <CaseStudyShell eyebrow="Internal Hackathon · Onsite 2026" title="Notability on Your Wrist" onClose={onClose}>
+      <section className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 py-12 md:grid-cols-[0.95fr_1.05fr] md:py-16">
+        <div className="flex flex-col justify-center">
+          <SketchBox seed={175} className="mb-6 w-fit bg-ink px-4 py-2 font-mono text-[11px] uppercase tracking-[0.24em] text-canvas">
+            ★ 4th place overall
+          </SketchBox>
+          <Eyebrow className="mb-4">Notability · Team Melon · My role: QA + Apple Watch</Eyebrow>
+          <h2 className="font-serif text-5xl leading-[1.05] text-ink md:text-6xl">
+            Notability that knows your semester and follows you to your wrist.
+          </h2>
+          <p className="mt-7 text-lg leading-8 text-graphite">
+            For Notability’s company-wide onsite hackathon, our team imagined it was December 2027 and Notability had become the world’s best proactive, AI-driven assistant for students. Then we asked what we would have had to build to get there, built the first piece in a day, and placed 4th overall.
+          </p>
+          <p className="mt-5 text-base leading-7 text-graphite">
+            We connected Canvas so a student’s assignments and class meetings flow into Notability’s Coming Up card, and made capture one motion away on the device students already wear: an Apple Watch app, watch-face complications, and Siri phrases like “Hey Siri, create a new note in Notability.”
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            {["Apple Watch UI", "Smart naming", "Siri", "Canvas API", "QA", "4th place overall"].map((tag, i) => (
+              <Tag key={tag} seed={i + 170}>{tag}</Tag>
+            ))}
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-full border border-neutral-300 bg-white p-3 shadow-sm transition hover:bg-neutral-100"
-            aria-label="Close Studio by Fifi case study"
-          >
-            <X size={20} />
+        </div>
+
+        <div>
+          <button type="button" onClick={() => setExpandedImage(nbScreenshots[1])} className="group block w-full rotate-1 outline-none">
+            <SketchFrame variant="classic" seed={180} className="aspect-square w-full">
+              <img src={nbScreenshots[1].src} alt={nbScreenshots[1].label} className="h-full w-full bg-white object-contain" />
+            </SketchFrame>
           </button>
-        </div>
-      </div>
-
-      <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-[0.85fr_1.15fr]">
-          <div className="flex flex-col justify-center">
-            <Sparkles className="mb-6" size={44} />
-            <p className="mb-4 text-xs uppercase tracking-[0.35em] text-neutral-500">
-              Small Business + Creative Website
-            </p>
-            <h2 className="font-serif text-5xl leading-tight text-neutral-950 md:text-7xl">
-              A hand-drawn sticker and stationery shop.
-            </h2>
-            <p className="mt-7 text-lg leading-8 text-neutral-700">
-              Studio by Fifi is my personal sticker and stationery shop, where I design hand-drawn products and turn them into manufactured physical items. This project is more personal and creative than my academic work, but it still reflects my interest in visual design, branding, product presentation, and building a polished online experience.
-            </p>
-            <p className="mt-5 text-base leading-7 text-neutral-700">
-              For this site, I wanted the shop to feel cute, approachable, and cohesive with the handmade style of the products. The design decisions are centered around showing the personality behind the brand while still making the shopping experience clear and easy to navigate.
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              {["Hand-drawn products", "Brand identity", "Shop design", "Stationery"].map((tag) => (
-                <span key={tag} className="rounded-full border border-orange-200 bg-white px-4 py-2 text-sm text-neutral-700 shadow-sm">
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-4">
-              <a
-                href="https://studiobyfifi.com/"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-3 rounded-full bg-neutral-950 px-7 py-4 text-sm font-medium text-white shadow-xl transition hover:-translate-y-1 hover:bg-neutral-800"
-              >
-                Open Shop <ArrowRight size={18} />
-              </a>
-
-              <a
-                href="https://www.instagram.com/studiobyfifi/"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-3 rounded-full border border-neutral-300 bg-white px-7 py-4 text-sm font-medium text-neutral-900 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-              >
-                Instagram @studiobyfifi <ArrowRight size={18} />
-              </a>
-            </div>
+          <div className="mt-4 text-center">
+            <p className="font-serif text-lg text-ink">The magic moment</p>
+            <p className="mt-1 text-xs text-pencil">Tap “Start recording” on the watch — a new note opens on the iPhone, already recording</p>
           </div>
-
-          <div className="rotate-1 rounded-sm border-[14px] border-neutral-950 bg-white p-4 shadow-2xl">
-            <div className="overflow-hidden rounded-sm border border-neutral-200 bg-neutral-100">
-              <img
-                src={`${import.meta.env.BASE_URL}sbf.png`}
-                alt="Studio by Fifi website preview"
-                className="h-[620px] w-full object-cover bg-white"
-              />
-            </div>
-            <div className="mt-4 rounded-sm border border-neutral-200 bg-white px-4 py-3 text-center">
-              <p className="font-serif text-sm text-neutral-950">Shop Opening page</p>
-              <p className="mt-1 text-xs text-neutral-500">
-                Personal storefront for hand-drawn stickers and stationery
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {[
-            {
-              title: "Creative Direction",
-              text: "The shop reflects my personal drawing style, with a focus on cute, handmade, and approachable visuals.",
-            },
-            {
-              title: "Product Thinking",
-              text: "I make design decisions not only around how the products look, but also how they are presented, categorized, and experienced by customers.",
-            },
-            {
-              title: "Personal Brand",
-              text: "Studio by Fifi lets me explore branding, visual identity, and small-business storytelling outside of class projects.",
-            },
-          ].map((card) => (
-            <div key={card.title} className="rounded-sm border border-orange-100 bg-white p-6 shadow-sm">
-              <Sparkles className="mb-5" size={30} />
-              <h3 className="font-serif text-2xl text-neutral-950">{card.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-neutral-700">{card.text}</p>
-            </div>
-          ))}
         </div>
       </section>
-    </motion.div>
+
+      <section className="mx-auto max-w-7xl px-6 py-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <Note title="The prompt" label="Tuesday · Brainstorm" seed={185}>
+            It’s December 2027. Notability has become the world’s best proactive, AI-driven assistant for students. What did we do to get here?
+          </Note>
+          <Note title="Our goal" label="Dec 2027" seed={186}>
+            Let students capture and build notes with AI from whatever device they’re on, starting with Siri, and remove friction by improving the Notability device ecosystem.
+          </Note>
+          <Note title="Why it matters" label="The bet" seed={187}>
+            A proactive assistant needs two things we didn’t have that morning: knowledge of the student’s schedule, and a way to act on it from whatever device is closest.
+          </Note>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-12">
+        <div className="mb-8">
+          <Eyebrow className="mb-3">Wednesday · The Build</Eyebrow>
+          <h2 className="font-serif text-5xl text-ink">What we built</h2>
+        </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <Note title="Canvas → Coming Up" label="Part 01" seed={190}>
+            Assignments, announcements, and class meetings from Canvas flow into Notability’s Coming Up card with due dates. Siri answers “What’s my next assignment?” or “When’s my next class?” without opening the app.
+          </Note>
+          <Note title="Apple Watch app" label="Part 02" seed={191}>
+            Three actions: Start recording, Create note, and Get help, plus Create Note and Start Recording complications right on the watch face. If the phone is in a bag, the watch records on its own and hands the audio over.
+          </Note>
+          <Note title="Help by voice" label="Part 03" seed={192}>
+            Get help files a support request by voice straight to Fin, with the issue category and diagnostics attached, so students never have to dig through settings.
+          </Note>
+        </div>
+        <SketchBox seed={193} faint className="mt-6 bg-canvas/60 p-6 md:p-8">
+          <Eyebrow className="mb-3">Where the two halves meet</Eyebrow>
+          <p className="max-w-4xl font-serif text-2xl leading-snug text-ink md:text-3xl">
+            A student walks into Biology 101, taps the watch face once or says the words, and a note opens on their iPhone, recording, already bound to that class from Canvas. Later, Coming Up reopens the same note next to the assignment it belongs to.
+          </p>
+          <p className="mt-4 text-sm leading-7 text-graphite">
+            Every capture lands as a normal note, so transcripts, flashcards, and chat work on it with nothing new to build.
+          </p>
+        </SketchBox>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-12">
+        <div className="mb-10">
+          <Eyebrow className="mb-3">Thursday · Science Fair</Eyebrow>
+          <h2 className="font-serif text-5xl text-ink">Screens from the build</h2>
+          <HandNote className="mt-3">click a screen to look closer ↓</HandNote>
+        </div>
+        <ScreenshotGrid
+          shots={nbScreenshots}
+          seedBase={200}
+          onExpand={setExpandedImage}
+          cols="md:grid-cols-2 lg:grid-cols-4"
+          aspect="aspect-[4/5]"
+          fit="object-contain"
+        />
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-12">
+        <SketchBox seed={210} className="bg-ink p-8 text-canvas md:p-12">
+          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.28em] text-canvas/50">Success Metric</p>
+          <h2 className="font-serif text-4xl md:text-5xl">Canvas-connected students record more.</h2>
+          <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-3">
+            {[
+              ["40%", "of students who connect Canvas start a note or recording from Coming Up, Siri, or the watch within two weeks"],
+              ["+25%", "more recording sessions per week than students without Canvas connected"],
+              ["< 5s", "from deciding to record to recording via watch or Siri — down from about 20 seconds on the phone"],
+            ].map(([stat, text]) => (
+              <div key={stat}>
+                <p className="font-serif text-6xl md:text-7xl">{stat}</p>
+                <p className="mt-3 text-sm leading-6 text-canvas/70">{text}</p>
+              </div>
+            ))}
+          </div>
+        </SketchBox>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-16 pt-4">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.2fr_0.8fr]">
+          <Note title="My role" label="QA · Watch UI · Smart naming" seed={220}>
+            <p>
+              I joined a six-person team spanning support, iOS, backend, and design as QA, and also picked up build work on the watch side.
+            </p>
+            <ul className="mt-4 space-y-3">
+              <li>
+                <strong className="font-medium text-ink">Smart note naming + filing:</strong> I implemented naming for notes and recordings started from the Apple Watch. A capture takes the name given on the watch, or, if a class or event is happening at that moment, it’s named after that class and filed into its folder automatically.
+              </li>
+              <li>
+                <strong className="font-medium text-ink">Apple Watch UI:</strong> I worked on the interface for the Notability watch app.
+              </li>
+              <li>
+                <strong className="font-medium text-ink">QA:</strong> I tested the flows end to end as they came together, like what “Start recording” does when the iPhone app isn’t open.
+              </li>
+            </ul>
+          </Note>
+          <Note title="Team Melon" label="The team" seed={221}>
+            <ul className="mt-1 space-y-1.5 font-mono text-xs">
+              {[
+                ["Luis Guerra", "Support · Lead"],
+                ["Drew Bratcher", "iOS"],
+                ["Fifi Xu", "QA"],
+                ["Jeremy Keys", "Backend"],
+                ["Lisa Tran", "Support"],
+                ["Natalie Kleinberg", "Design"],
+              ].map(([name, role]) => (
+                <li key={name} className={`flex justify-between gap-4 ${name === "Fifi Xu" ? "text-ink" : ""}`}>
+                  <span>{name}</span>
+                  <span className="text-pencil">{role}</span>
+                </li>
+              ))}
+            </ul>
+          </Note>
+        </div>
+      </section>
+
+      <ImageLightbox image={expandedImage} onClose={() => setExpandedImage(null)} />
+    </CaseStudyShell>
   );
 }
 
@@ -691,135 +742,110 @@ function PlaceholderCaseStudy({ project, onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#f6f3ed] p-6"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-paper p-6"
     >
-      <div className="max-w-2xl rounded-sm border border-neutral-300 bg-white p-10 text-center shadow-2xl">
-        <p className="mb-3 text-xs uppercase tracking-[0.35em] text-neutral-500">Coming Soon</p>
-        <h2 className="font-serif text-5xl text-neutral-950">{project.title}</h2>
-        <p className="mt-5 text-neutral-600">We can fill this project page next after the HCI case study is working.</p>
-        <button onClick={onClose} className="mt-8 rounded-full bg-neutral-950 px-6 py-3 text-sm text-white">
+      <SketchBox seed={200} className="max-w-2xl bg-canvas p-10 text-center">
+        <Eyebrow className="mb-3">Coming Soon</Eyebrow>
+        <h2 className="font-serif text-5xl text-ink">{project.title}</h2>
+        <button onClick={onClose} className="mt-8 bg-ink px-6 py-3 font-mono text-xs uppercase tracking-[0.2em] text-canvas">
           Back to gallery
         </button>
-      </div>
+      </SketchBox>
     </motion.div>
   );
 }
 
-function Entrance({ onEnter }) {
+// ---------- the gallery wall ----------
+
+function Baseboard() {
+  const lines = useMemo(() => {
+    const r = rng(17);
+    return [
+      roughLine(0, 10, 3000, 10, r, { over: 0, wobble: 2 }),
+      roughLine(0, 20, 3000, 20, r, { over: 0, wobble: 2 }),
+    ];
+  }, []);
   return (
-    <section className="relative flex h-screen min-h-[720px] items-center justify-center overflow-hidden bg-[url('/brick.png')] bg-cover bg-center px-6">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,231,186,0.25),transparent_34%),linear-gradient(to_bottom,rgba(0,0,0,0.05),rgba(0,0,0,0.28))]" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative z-10 flex flex-col items-center"
-      >
-        <div className="mb-8 rounded-full border border-white/25 bg-black/20 px-5 py-2 text-xs uppercase tracking-[0.35em] text-white/85 backdrop-blur">
-          My Gallery
-        </div>
-
-        <motion.button
-          onClick={onEnter}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-          className="group relative h-[460px] w-[280px] outline-none md:h-[520px] md:w-[320px]"
-        >
-          <img
-            src={`${import.meta.env.BASE_URL}door.png`}
-            alt="Gallery Entrance Door"
-            className="h-full w-full object-contain"
-          />
-        </motion.button>
-
-        <p className="mt-18 max-w-md text-center font-serif text-3xl text-white md:text-5xl">Fiora Xu</p>
-        <p className="mt-3 max-w-xl text-center text-sm leading-6 text-white/80 md:text-base">
-          A portfolio built like a small exhibition: enter, walk along the wall, and open each project as its own frame.
-        </p>
-      </motion.div>
-    </section>
+    <svg
+      className="pointer-events-none absolute bottom-[9vh] left-0 h-10 w-full"
+      viewBox="0 0 3000 40"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <g fill="none" stroke="var(--ink)" vectorEffect="non-scaling-stroke">
+        <path d={lines[0]} strokeWidth="1.1" opacity="0.6" vectorEffect="non-scaling-stroke" />
+        <path d={lines[1]} strokeWidth="0.8" opacity="0.35" vectorEffect="non-scaling-stroke" />
+      </g>
+    </svg>
   );
+}
+
+function RoomMarker({ children }) {
+  return <Eyebrow className="absolute left-8 top-8 md:left-12 md:top-10">{children}</Eyebrow>;
 }
 
 function GalleryWalk({ onOpenProject }) {
   const { scrollYProgress } = useScroll();
-  const x = useTransform(scrollYProgress, [0.08, 0.95], ["0%", "-66.66%"]);
+  const x = useTransform(scrollYProgress, [0.04, 0.96], ["0%", "-66.66%"]);
 
   return (
-    <div className="relative h-[330vh] bg-neutral-100">
-      <div className="sticky top-0 h-screen overflow-hidden bg-[#f6f3ed] bg-[url('/stucco.png')] bg-cover bg-center">
-        <div className="absolute left-1/2 top-0 z-20 h-40 w-[46vw] -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(255,225,160,0.95),rgba(255,214,140,0.38)_38%,rgba(255,230,180,0.14)_62%,transparent_78%)] blur-[2px]" />
+    <div className="relative h-[330vh]">
+      <div className="sticky top-0 h-screen overflow-hidden bg-paper">
+        <motion.div style={{ x, willChange: "transform" }} className="relative flex h-full w-[300vw]">
+          <Baseboard />
 
-        <div className="absolute left-1/2 top-2 z-30 h-10 w-28 -translate-x-1/2 rounded-b-full border border-neutral-800 bg-gradient-to-b from-neutral-700 to-neutral-950 shadow-[0_12px_30px_rgba(0,0,0,0.45)]">
-          <div className="absolute left-1/2 top-2 h-2 w-14 -translate-x-1/2 rounded-full bg-white/20" />
-          <div className="absolute left-1/2 bottom-0 h-2 w-20 -translate-x-1/2 rounded-t-full bg-amber-200/70 blur-[1px]" />
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 z-10 h-32 bg-gradient-to-t from-neutral-300 to-transparent" />
-
-        <motion.div style={{ x }} className="flex h-full w-[300vw]">
           <section className="relative flex h-screen w-screen items-center justify-center px-8">
+            <RoomMarker>Room 00 — Introduction</RoomMarker>
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="relative grid max-w-6xl grid-cols-1 items-center gap-10 md:grid-cols-[0.9fr_1.1fr]"
+              className="relative grid max-w-6xl grid-cols-1 items-center gap-14 md:grid-cols-[0.8fr_1.2fr]"
             >
-              <div className="relative h-[520px] w-[400px] mx-auto">
-                {/* Frame */}
-                <img
-                  src={`${import.meta.env.BASE_URL}frame-portrait.png`}
-                  className="absolute z-20 max-w-none object-fill pointer-events-none"
-                  style={{
-                    top: "-75px",
-                    left: "-110px",
-                    width: "calc(100% + 220px)",
-                    height: "calc(100% + 170px)",
-                  }}
-                />
-                {/* Image inside frame */}
-                <img
-                  src={`${import.meta.env.BASE_URL}bday.jpg`}
-                  className="absolute z-10 object-cover"
-                  style={{
-                    top: "28px",
-                    left: "28px",
-                    width: "calc(100% - 56px)",
-                    height: "calc(100% - 56px)",
-                  }}
-                />
+              <div className="group relative mx-auto h-[380px] w-[290px] -rotate-1 md:h-[440px] md:w-[340px]">
+                <HangingWire />
+                <SketchFrame variant="matted" seed={4} className="h-full w-full">
+                  <img
+                    src={`${import.meta.env.BASE_URL}bday.jpg`}
+                    alt="Fiora Xu"
+                    className="h-full w-full object-cover"
+                  />
+                </SketchFrame>
+                <HandNote className="absolute -bottom-10 right-0 rotate-[-3deg]">that’s me ↑</HandNote>
               </div>
 
-              <div className="rounded-sm border border-neutral-300 bg-white/90 p-8 shadow-xl backdrop-blur md:p-12">
-                <p className="mb-4 text-xs uppercase tracking-[0.35em] text-neutral-500">Exhibit 00</p>
-                <h1 className="font-serif text-5xl text-neutral-950 md:text-7xl">About Me</h1>
-                <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-700">
+              <div>
+                <Eyebrow className="mb-4">Exhibit 00</Eyebrow>
+                <h1 className="font-serif text-6xl leading-none text-ink md:text-8xl">
+                  About <span className="italic">Me</span>
+                </h1>
+                <PencilRule className="mt-6 max-w-md" />
+                <p className="mt-6 max-w-2xl text-lg leading-8 text-graphite">
                   I’m Fiora Xu, a 21-year-old Computer Science major with a concentration in Human-Centered Computing at Northeastern University.
-
-I’m passionate about UI/UX, product design, and quality assurance, with experience in QA and building web-based projects.
-
-I enjoy working at the intersection of design and functionality—thinking about how products not only work, but feel to use.
+                  I’m passionate about product management, UI/UX, product design, and quality assurance, with experience in QA and building web-based projects.
+                  I enjoy working at the intersection of design and functionality—thinking about how products not only work, but feel to use.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
-                  {["UI/UX", "HCI", "Frontend", "Data Visualization"].map((tag) => (
-                    <span key={tag} className="rounded-full border border-neutral-300 px-4 py-2 text-sm text-neutral-700">{tag}</span>
+                  {["Product / PM", "UI/UX", "HCI", "Frontend", "Data Visualization"].map((tag, i) => (
+                    <Tag key={tag} seed={i + 10}>{tag}</Tag>
                   ))}
                 </div>
-                <div className="mt-10 flex items-center gap-3 text-sm uppercase tracking-[0.25em] text-neutral-500">
-                  Keep scrolling to walk along the wall <ArrowRight size={18} />
-                </div>
+                <HandNote className="mt-10 flex items-center gap-2">
+                  keep scrolling to walk along the wall <ArrowRight size={20} strokeWidth={1.5} />
+                </HandNote>
               </div>
             </motion.div>
           </section>
 
           <section className="relative flex h-screen w-screen items-center justify-center px-8">
+            <RoomMarker>Room 01 — Main Hall</RoomMarker>
             <div className="relative w-full max-w-7xl">
-              <div className="mb-12 flex items-end justify-between gap-6">
+              <div className="mb-20 flex items-end justify-between gap-6">
                 <div>
-                  <p className="mb-3 text-xs uppercase tracking-[0.35em] text-neutral-500">Main Hall</p>
-                  <h2 className="font-serif text-5xl text-neutral-950 md:text-7xl">Project Wall</h2>
+                  <Eyebrow className="mb-3">Selected Works</Eyebrow>
+                  <h2 className="font-serif text-5xl text-ink md:text-7xl">Project Wall</h2>
                 </div>
+                <HandNote className="hidden md:block">click a frame to step inside</HandNote>
               </div>
 
               <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-4">
@@ -831,47 +857,41 @@ I enjoy working at the intersection of design and functionality—thinking about
           </section>
 
           <section className="relative flex h-screen w-screen items-center justify-center px-8">
-            <div className="relative max-w-4xl rounded-sm border border-neutral-300 bg-white p-10 text-center shadow-2xl md:p-16">
-              <Sparkles className="mx-auto mb-6" size={42} />
-              <p className="mb-3 text-xs uppercase tracking-[0.35em] text-neutral-500">Exit Plaque</p>
-              <h2 className="font-serif text-5xl text-neutral-950 md:text-7xl">Contact</h2>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-neutral-700">
-                Thanks for walking through my work! I’m especially interested in opportunities in UI/UX, product design, and quality assurance, where I can continue building thoughtful, user-centered experiences. If anything here resonated with you, I’d love to connect.
+            <RoomMarker>Room 02 — Exit</RoomMarker>
+            <SketchBox seed={30} className="relative max-w-4xl bg-canvas/70 p-10 text-center md:p-16">
+              <Eyebrow className="mb-3">Exit Plaque</Eyebrow>
+              <h2 className="font-serif text-6xl text-ink md:text-8xl">Contact</h2>
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-graphite">
+                Thanks for walking through my work! I’m especially interested in opportunities in product management, UI/UX, product design, and quality assurance, where I can continue building thoughtful, user-centered experiences. If anything here resonated with you, I’d love to connect.
               </p>
               <div className="mt-10 grid gap-6 md:grid-cols-2">
-
-                {/* Email Card */}
-                <a
+                <SketchBox
+                  as="a"
+                  seed={31}
                   href="mailto:msfiora@gmail.com"
-                  className="group flex items-center gap-5 rounded-xl border border-neutral-300 bg-white px-6 py-5 shadow-lg transition hover:-translate-y-1 hover:shadow-2xl"
+                  className="group block px-6 py-5 text-left transition hover:-translate-y-0.5 hover:bg-paper"
                 >
-                  <div className="rounded-full bg-neutral-950 p-3 text-white">
-                    <Mail size={20} />
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">Email</p>
-                    <p className="mt-1 font-serif text-lg text-neutral-900">msfiora@gmail.com</p>
-                  </div>
-                </a>
+                  <Eyebrow>Email</Eyebrow>
+                  <p className="mt-1 flex items-center justify-between font-serif text-xl text-ink">
+                    msfiora@gmail.com <ArrowUpRight size={18} strokeWidth={1.5} />
+                  </p>
+                </SketchBox>
 
-                {/* LinkedIn Card */}
-                <a
+                <SketchBox
+                  as="a"
+                  seed={32}
                   href="https://www.linkedin.com/in/fiora-xu-17b00223a"
                   target="_blank"
                   rel="noreferrer"
-                  className="group flex items-center gap-5 rounded-xl border border-neutral-300 bg-white px-6 py-5 shadow-lg transition hover:-translate-y-1 hover:shadow-2xl"
+                  className="group block px-6 py-5 text-left transition hover:-translate-y-0.5 hover:bg-paper"
                 >
-                  <div className="rounded-full bg-neutral-950 p-3 text-white">
-                    <UserRound size={20} />
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">LinkedIn</p>
-                    <p className="mt-1 font-serif text-lg text-neutral-900">View Profile</p>
-                  </div>
-                </a>
-
+                  <Eyebrow>LinkedIn</Eyebrow>
+                  <p className="mt-1 flex items-center justify-between font-serif text-xl text-ink">
+                    View Profile <ArrowUpRight size={18} strokeWidth={1.5} />
+                  </p>
+                </SketchBox>
               </div>
-            </div>
+            </SketchBox>
           </section>
         </motion.div>
       </div>
@@ -880,45 +900,28 @@ I enjoy working at the intersection of design and functionality—thinking about
 }
 
 export default function App() {
-  const [entered, setEntered] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 
   return (
-    <main className="min-h-screen bg-neutral-100 text-neutral-950">
-      <AnimatePresence mode="wait">
-        {!entered ? (
-          <motion.div
-            key="entrance"
-            exit={{ opacity: 0, scale: 1.04 }}
-            transition={{ duration: 0.7 }}
-          >
-            <Entrance onEnter={() => setEntered(true)} />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="gallery"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.7 }}
-          >
-            <GalleryWalk onOpenProject={setSelectedProject} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <main className="min-h-screen bg-paper text-ink">
+      <SketchDefs />
+      <div className="paper-grain" aria-hidden="true" />
+
+      <GalleryWalk onOpenProject={setSelectedProject} />
 
       <AnimatePresence>
         {selectedProject?.id === "hci" && <HciCaseStudy onClose={() => setSelectedProject(null)} />}
         {selectedProject?.id === "viz" && <VizCaseStudy onClose={() => setSelectedProject(null)} />}
         {selectedProject?.id === "web" && <WebCaseStudy onClose={() => setSelectedProject(null)} />}
-        {selectedProject?.id === "extra" && <ShopCaseStudy onClose={() => setSelectedProject(null)} />}
-        {selectedProject && selectedProject.id !== "hci" && selectedProject.id !== "viz" && selectedProject.id !== "web" && selectedProject.id !== "extra" && (
+        {selectedProject?.id === "nb" && <NotabilityCaseStudy onClose={() => setSelectedProject(null)} />}
+        {selectedProject && !["hci", "viz", "web", "nb"].includes(selectedProject.id) && (
           <PlaceholderCaseStudy project={selectedProject} onClose={() => setSelectedProject(null)} />
         )}
       </AnimatePresence>
 
-      {entered && !selectedProject && (
-        <div className="fixed bottom-5 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-neutral-300 bg-white/80 px-4 py-2 text-xs text-neutral-600 shadow-lg backdrop-blur">
-          <MapPin size={14} /> Scroll to walk through the gallery
+      {!selectedProject && (
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
+          <HandNote className="text-xl text-pencil">scroll to walk through the gallery ⟶</HandNote>
         </div>
       )}
     </main>
