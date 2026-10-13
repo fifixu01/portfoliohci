@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { f, rng, roughLine, roughRect } from "./rough.js";
+import { rng, roughLine, roughRect } from "./rough.js";
 
 function useSize() {
   const ref = useRef(null);
@@ -17,7 +17,16 @@ function useSize() {
   return [ref, size];
 }
 
-// ---------- shared SVG defs (filters + hatch patterns) ----------
+// ---------- shared SVG defs: pencil wobble + hatch plates ----------
+
+function HatchPattern({ id, gap, width, angle, double = false }) {
+  return (
+    <pattern id={id} width={gap} height={gap} patternUnits="userSpaceOnUse" patternTransform={`rotate(${angle})`}>
+      <line x1="0" y1="0" x2="0" y2={gap} stroke="var(--ink)" strokeWidth={width} />
+      {double && <line x1="0" y1="0" x2={gap} y2="0" stroke="var(--ink)" strokeWidth={width} />}
+    </pattern>
+  );
+}
 
 export function SketchDefs() {
   return (
@@ -25,68 +34,52 @@ export function SketchDefs() {
       <defs>
         <filter id="pencil" x="-10%" y="-10%" width="120%" height="120%">
           <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="3" result="n" />
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G" />
         </filter>
         <filter id="pencil-2" x="-10%" y="-10%" width="120%" height="120%">
           <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="11" result="n" />
-          <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="G" yChannelSelector="R" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="G" yChannelSelector="R" />
         </filter>
-        <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="5" stroke="var(--ink)" strokeWidth="0.7" />
-        </pattern>
-        <pattern id="hatch-dense" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="3" stroke="var(--ink)" strokeWidth="0.7" />
-        </pattern>
-        <pattern id="crosshatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-          <line x1="0" y1="0" x2="0" y2="4" stroke="var(--ink)" strokeWidth="0.6" />
-          <line x1="0" y1="0" x2="4" y2="0" stroke="var(--ink)" strokeWidth="0.6" />
-        </pattern>
+        {/* engraving plates: sparse → dense, several angles */}
+        <HatchPattern id="h-sparse" gap={6} width={0.55} angle={45} />
+        <HatchPattern id="h-mid" gap={4} width={0.6} angle={45} />
+        <HatchPattern id="h-dense" gap={2.4} width={0.65} angle={45} />
+        <HatchPattern id="h-cross" gap={3.2} width={0.55} angle={45} double />
+        <HatchPattern id="h-steep" gap={3.6} width={0.55} angle={75} />
+        <HatchPattern id="h-flat" gap={4} width={0.55} angle={-20} />
+        <HatchPattern id="h-horiz" gap={3} width={0.5} angle={0} />
+        <HatchPattern id="h-wave" gap={5} width={0.5} angle={-8} />
       </defs>
     </svg>
   );
 }
 
-// Draws its children twice: a firm line plus a faint offset second pass.
-export function Pencil({ children, width = 1.4 }) {
+// Children drawn with a firm line plus a faint offset second pass, like a pencil going over twice.
+export function Pencil({ children, width = 1.3, second = true }) {
   return (
     <g fill="none" stroke="var(--ink)" strokeWidth={width} strokeLinecap="round" strokeLinejoin="round">
       <g filter="url(#pencil)">{children}</g>
-      <g filter="url(#pencil-2)" opacity="0.35" transform="translate(0.8 0.6)">{children}</g>
+      {second && (
+        <g filter="url(#pencil-2)" opacity="0.28" transform="translate(0.7 0.5)">
+          {children}
+        </g>
+      )}
     </g>
   );
 }
 
-// ---------- boxes + frames ----------
-
-// A hand-drawn rectangle border around any content.
-export function SketchBox({ as: Tag = "div", seed = 1, className = "", children, faint = false, ...props }) {
-  const [ref, { w, h }] = useSize();
-  const r1 = rng(seed);
-  const r2 = rng(seed + 97);
-  return (
-    <Tag ref={ref} className={`relative ${className}`} {...props}>
-      {w > 0 && (
-        <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
-          <g fill="none" stroke="var(--ink)" strokeLinecap="round">
-            <path d={roughRect(0, 0, w, h, r1)} strokeWidth={faint ? 0.8 : 1.2} opacity={faint ? 0.55 : 1} />
-            <path d={roughRect(0, 0, w, h, r2, { over: 6, wobble: 1.8 })} strokeWidth="0.7" opacity="0.35" />
-          </g>
-        </svg>
-      )}
-      {children}
-    </Tag>
-  );
-}
+// ---------- frames ----------
 
 const FRAME_STYLES = {
-  classic: { t: 22, mat: 0 },
-  matted: { t: 18, mat: 16 },
-  ornate: { t: 26, mat: 0 },
-  thin: { t: 12, mat: 10 },
+  classic: { t: 20, mat: 0 },
+  matted: { t: 16, mat: 18 },
+  ornate: { t: 24, mat: 0 },
+  thin: { t: 10, mat: 12 },
+  deep: { t: 14, mat: 26 },
 };
 
-// A sketched picture frame: outer + inner rect, mitred corners, hatched shading.
-export function SketchFrame({ variant = "classic", seed = 1, className = "", innerClassName = "", children }) {
+// A sketched picture frame with a real cast shadow behind it.
+export function SketchFrame({ variant = "classic", seed = 1, className = "", innerClassName = "", shadow = true, children }) {
   const [ref, { w, h }] = useSize();
   const { t, mat } = FRAME_STYLES[variant];
   const r = rng(seed);
@@ -94,14 +87,14 @@ export function SketchFrame({ variant = "classic", seed = 1, className = "", inn
   const m = t + mat;
 
   return (
-    <div ref={ref} className={`relative ${className}`} style={{ padding: m }}>
+    <div ref={ref} className={`relative bg-paper ${shadow ? "shadow-frame" : ""} ${className}`} style={{ padding: m }}>
       <div className={`relative h-full w-full overflow-hidden bg-canvas ${innerClassName}`}>{children}</div>
       {w > 0 && (
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
-          {/* frame moulding is a shade darker than the wall */}
+          {/* moulding slightly darker than the wall */}
           <path
             d={`M0,0 H${w} V${h} H0 Z M${t},${t} V${h - t} H${w - t} V${t} Z`}
-            fill="var(--paper)"
+            fill="rgba(40,34,26,0.06)"
             fillRule="evenodd"
           />
           {mat > 0 && (
@@ -111,13 +104,18 @@ export function SketchFrame({ variant = "classic", seed = 1, className = "", inn
               fillRule="evenodd"
             />
           )}
-          {/* shading on the right + bottom of the moulding */}
-          <polygon points={`${w},0 ${w},${h} ${w - t},${h - t} ${w - t},${t}`} fill="url(#hatch)" opacity="0.55" />
-          <polygon points={`0,${h} ${w},${h} ${w - t},${h - t} ${t},${h - t}`} fill="url(#hatch-dense)" opacity="0.5" />
+          {/* light from top-left: shade the right and bottom of the moulding */}
+          <polygon points={`${w},0 ${w},${h} ${w - t},${h - t} ${w - t},${t}`} fill="url(#h-mid)" opacity="0.5" />
+          <polygon points={`0,${h} ${w},${h} ${w - t},${h - t} ${t},${h - t}`} fill="url(#h-dense)" opacity="0.45" />
+          <polygon points={`0,0 ${w},0 ${w - t},${t} ${t},${t}`} fill="url(#h-sparse)" opacity="0.18" />
+          {/* mat bevel shadow on the top/left inner edge */}
+          {mat > 0 && (
+            <path d={`M${m},${h - m} V${m} H${w - m}`} fill="none" stroke="rgba(40,34,26,0.18)" strokeWidth="2" />
+          )}
 
           <g fill="none" stroke="var(--ink)" strokeLinecap="round" filter="url(#pencil)">
-            <path d={roughRect(0, 0, w, h, r, { over: 6 })} strokeWidth="1.5" />
-            <path d={roughRect(t, t, w - 2 * t, h - 2 * t, r)} strokeWidth="1.2" />
+            <path d={roughRect(0, 0, w, h, r, { over: 5 })} strokeWidth="1.5" />
+            <path d={roughRect(t, t, w - 2 * t, h - 2 * t, r)} strokeWidth="1.05" />
             <path
               d={[
                 roughLine(0, 0, t, t, r, { over: 1 }),
@@ -125,33 +123,36 @@ export function SketchFrame({ variant = "classic", seed = 1, className = "", inn
                 roughLine(w, h, w - t, h - t, r, { over: 1 }),
                 roughLine(0, h, t, h - t, r, { over: 1 }),
               ].join(" ")}
-              strokeWidth="0.9"
+              strokeWidth="0.8"
             />
             {variant === "classic" && (
-              <path d={roughRect(t * 0.45, t * 0.45, w - t * 0.9, h - t * 0.9, r2)} strokeWidth="0.7" opacity="0.6" />
+              <path d={roughRect(t * 0.45, t * 0.45, w - t * 0.9, h - t * 0.9, r2)} strokeWidth="0.6" opacity="0.55" />
             )}
             {variant === "ornate" && (
               <>
-                <path d={roughRect(-6, -6, w + 12, h + 12, r2, { over: 8 })} strokeWidth="0.8" opacity="0.5" />
-                <path d={roughRect(t * 0.35, t * 0.35, w - t * 0.7, h - t * 0.7, r2)} strokeWidth="0.7" opacity="0.6" />
+                <path d={roughRect(-5, -5, w + 10, h + 10, r2, { over: 7 })} strokeWidth="0.75" opacity="0.5" />
+                <path d={roughRect(t * 0.35, t * 0.35, w - t * 0.7, h - t * 0.7, r2)} strokeWidth="0.6" opacity="0.55" />
                 {[
                   [t / 2, t / 2],
                   [w - t / 2, t / 2],
                   [w - t / 2, h - t / 2],
                   [t / 2, h - t / 2],
                 ].map(([cx, cy]) => (
-                  <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={t * 0.26} strokeWidth="0.9" fill="var(--canvas)" />
+                  <g key={`${cx}-${cy}`}>
+                    <circle cx={cx} cy={cy} r={t * 0.28} strokeWidth="0.9" fill="var(--canvas)" />
+                    <circle cx={cx} cy={cy} r={t * 0.12} strokeWidth="0.7" fill="url(#h-dense)" />
+                  </g>
                 ))}
               </>
             )}
-            {mat > 0 && <path d={roughRect(m, m, w - 2 * m, h - 2 * m, r2, { over: 2 })} strokeWidth="0.8" />}
+            {mat > 0 && <path d={roughRect(m, m, w - 2 * m, h - 2 * m, r2, { over: 2 })} strokeWidth="0.75" />}
           </g>
           <path
-            d={roughRect(0, 0, w, h, r2, { over: 9, wobble: 2 })}
+            d={roughRect(0, 0, w, h, r2, { over: 8, wobble: 2 })}
             fill="none"
             stroke="var(--ink)"
-            strokeWidth="0.6"
-            opacity="0.3"
+            strokeWidth="0.55"
+            opacity="0.28"
           />
         </svg>
       )}
@@ -159,141 +160,184 @@ export function SketchFrame({ variant = "classic", seed = 1, className = "", inn
   );
 }
 
-// Picture wire from the top of a frame to a nail.
-export function HangingWire() {
+// Picture wire from the frame to a nail.
+export function HangingWire({ drop = 56 }) {
   return (
     <svg
-      className="pointer-events-none absolute -top-14 left-0 h-14 w-full overflow-visible"
+      className="pointer-events-none absolute left-0 w-full overflow-visible"
+      style={{ top: -drop, height: drop }}
       viewBox="0 0 100 56"
       preserveAspectRatio="none"
       aria-hidden="true"
     >
-      <g fill="none" stroke="var(--ink)" strokeLinecap="round" opacity="0.7">
-        <path d="M24,58 Q37,28 50,6 Q63,28 76,58" strokeWidth="0.9" vectorEffect="non-scaling-stroke" />
-      </g>
-      <circle cx="50" cy="5" r="1.6" fill="var(--ink)" />
+      <path
+        d="M26,58 Q38,30 50,6 Q62,30 74,58"
+        fill="none"
+        stroke="var(--ink)"
+        strokeWidth="0.9"
+        strokeLinecap="round"
+        opacity="0.75"
+        vectorEffect="non-scaling-stroke"
+      />
+      <circle cx="50" cy="5" r="1.4" fill="var(--ink)" />
+      <ellipse cx="50" cy="7.5" rx="2.2" ry="0.6" fill="rgba(40,34,26,0.3)" />
     </svg>
   );
 }
 
-// ---------- pencil covers ----------
+// A plain museum label: small white card, no border, soft shadow.
+export function Plaque({ title, meta, className = "" }) {
+  return (
+    <div className={`bg-canvas px-4 py-2.5 text-center shadow-label ${className}`}>
+      <p className="font-display text-[15px] leading-tight text-ink">{title}</p>
+      <p className="mt-1 font-serif text-[11px] uppercase tracking-[0.18em] text-pencil">{meta}</p>
+    </div>
+  );
+}
 
-function Butterfly({ x, y, s = 1, rot = 0 }) {
+// ---------- engraved covers ----------
+// To replace any of these with your own drawing, drop a PNG/SVG in public/ and set
+// `cover: "your-file.png"` on the project in App.jsx; <Cover /> below will use it.
+
+function CoverButterfly() {
+  const fore =
+    "M126,146 C150,118 190,84 212,80 C224,80 226,96 218,112 C210,128 186,146 160,154 C148,158 134,156 126,146 Z";
+  const hind =
+    "M128,160 C150,158 184,166 200,186 C210,200 204,220 190,222 C170,224 146,206 132,180 C129,174 128,166 128,160 Z";
+  const foreInner = "M126,146 C140,130 162,116 180,110 C172,128 156,144 142,152 Z";
+  const hindInner = "M128,160 C146,160 168,172 180,190 C166,196 148,188 136,176 Z";
   const wing = (
     <>
-      <path d="M0,0 C10,-22 34,-26 30,-6 C28,4 12,4 0,2 Z" fill="url(#hatch)" />
-      <path d="M0,2 C14,6 24,18 14,26 C6,30 2,16 0,4 Z" />
-      <path d="M4,-2 C12,-10 20,-14 24,-10" opacity="0.6" />
+      <path d={fore} fill="url(#h-sparse)" />
+      <path d={foreInner} fill="url(#h-dense)" />
+      <path d={hind} fill="url(#h-sparse)" />
+      <path d={hindInner} fill="url(#h-dense)" />
+      {/* outer margin band */}
+      <path d="M212,80 C224,80 226,96 218,112 C210,128 186,146 160,154 C170,146 196,126 206,108 C212,96 212,86 212,80 Z" fill="url(#h-cross)" />
+      <path d="M200,186 C210,200 204,220 190,222 C180,222 170,218 160,212 C176,214 192,210 196,198 C198,192 198,188 200,186 Z" fill="url(#h-cross)" />
+      {/* veins */}
+      <g strokeWidth="0.75">
+        <path d="M128,148 Q168,110 212,86" />
+        <path d="M128,148 Q170,122 216,104" />
+        <path d="M128,148 Q166,136 206,124" />
+        <path d="M128,148 Q156,146 184,142" />
+        <path d="M130,162 Q164,172 198,190" />
+        <path d="M130,162 Q162,184 198,210" />
+        <path d="M130,162 Q154,196 184,220" />
+        <path d="M130,162 Q146,190 160,210" />
+      </g>
+      {/* pale spots near the tip */}
+      {[
+        [205, 95, 3.5, 2.2, -40],
+        [198, 108, 3, 2, -40],
+        [188, 120, 2.6, 1.8, -40],
+      ].map(([cx, cy, rx, ry, rot]) => (
+        <ellipse key={cx} cx={cx} cy={cy} rx={rx} ry={ry} transform={`rotate(${rot} ${cx} ${cy})`} fill="var(--canvas)" strokeWidth="0.7" />
+      ))}
     </>
   );
   return (
-    <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${s})`}>
-      {wing}
-      <g transform="scale(-1 1)">{wing}</g>
-      <path d="M0,-6 L0,22" strokeWidth="2" />
-      <path d="M0,-6 Q-4,-16 -9,-18 M0,-6 Q4,-16 9,-18" />
-    </g>
-  );
-}
-
-function star(cx, cy, r1, r2, n = 5) {
-  const pts = [];
-  for (let i = 0; i < n * 2; i++) {
-    const r = i % 2 === 0 ? r1 : r2;
-    const a = (Math.PI / n) * i - Math.PI / 2;
-    pts.push(`${f(cx + r * Math.cos(a))},${f(cy + r * Math.sin(a))}`);
-  }
-  return `M${pts.join(" L")} Z`;
-}
-
-function CoverHci() {
-  return (
-    <svg viewBox="0 0 240 260" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
-      <Pencil>
-        {[0, 6, 12, 18, 24].map((o) => (
-          <path key={o} d={`M14,${156 + o} C70,${136 + o} 150,${176 + o} 226,${150 + o}`} strokeWidth="0.8" opacity="0.7" />
-        ))}
-        <g transform="translate(104 168)">
-          <ellipse cx="0" cy="0" rx="8" ry="5.5" transform="rotate(-20)" fill="url(#hatch-dense)" />
-          <ellipse cx="28" cy="-7" rx="8" ry="5.5" transform="rotate(-20 28 -7)" fill="url(#hatch-dense)" />
-          <path d="M7,-3 L7,-48 L35,-55 L35,-10" />
-          <path d="M7,-48 L35,-55 M7,-43 L35,-50" strokeWidth="2.4" />
-        </g>
-        <Butterfly x={66} y={74} s={1.15} rot={-14} />
-        <Butterfly x={182} y={100} s={0.8} rot={18} />
-        <path d="M80,96 C98,140 140,58 168,104" strokeDasharray="2 6" strokeWidth="1" />
-        <path d="M30,222 Q120,212 210,224" strokeWidth="0.8" opacity="0.5" />
+    <svg viewBox="0 0 240 300" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
+      <Pencil width={1.1}>
+        <ellipse cx="120" cy="252" rx="68" ry="7" fill="url(#h-horiz)" stroke="none" opacity="0.5" />
+        {wing}
+        <g transform="translate(240 0) scale(-1 1)">{wing}</g>
+        {/* body */}
+        <path d="M114,158 C112,185 118,206 120,208 C122,206 128,185 126,158 Z" fill="url(#h-dense)" />
+        <ellipse cx="120" cy="150" rx="6.5" ry="13" fill="url(#h-mid)" />
+        <circle cx="120" cy="138" r="5.2" fill="url(#h-mid)" />
+        <path d="M117,134 C110,120 102,112 92,106 M123,134 C130,120 138,112 148,106" strokeWidth="0.9" />
+        <circle cx="91" cy="105" r="1.4" fill="var(--ink)" />
+        <circle cx="149" cy="105" r="1.4" fill="var(--ink)" />
+        <path d="M115,170 H125 M115,178 H125 M116,186 H124 M117,194 H123" strokeWidth="0.6" />
       </Pencil>
     </svg>
   );
 }
 
-function CoverViz() {
-  const bars = [
-    [48, 110],
-    [82, 70],
-    [116, 128],
-    [150, 52],
-    [184, 92],
-  ];
+function CoverTransit() {
+  const A = "M20,200 C80,200 100,60 170,60 C220,60 240,110 290,100";
+  const B = "M40,20 C60,110 150,130 150,200 C150,230 200,230 280,220";
+  const C = "M10,120 C70,130 120,110 170,150 C210,185 250,160 290,40";
   return (
-    <svg viewBox="0 0 240 240" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
-      <Pencil>
-        <path d="M30,26 L30,200 L216,200" />
-        {[60, 100, 140, 180].map((y) => (
-          <path key={y} d={`M26,${y} L34,${y}`} strokeWidth="1" />
-        ))}
-        {bars.map(([x, top]) => (
-          <rect key={x} x={x} y={top} width="22" height={200 - top} fill="url(#hatch)" strokeWidth="1.1" />
-        ))}
-        <path d="M59,96 L93,58 L127,112 L161,38 L195,78" strokeWidth="1.2" />
+    <svg viewBox="0 0 300 240" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
+      <Pencil width={1}>
+        {/* river */}
+        <path
+          d="M0,166 C60,148 90,190 150,174 C200,160 240,200 300,182 L300,204 C240,222 200,182 150,196 C90,212 60,172 0,190 Z"
+          fill="url(#h-wave)"
+          strokeWidth="0.6"
+          opacity="0.7"
+        />
+        {/* lines: solid, railroad, dashed */}
+        <path d={A} strokeWidth="3.4" />
+        <path d={B} strokeWidth="3.4" />
+        <path d={B} strokeWidth="1.2" stroke="var(--canvas)" />
+        <path d={C} strokeWidth="2.2" strokeDasharray="7 3.5" />
+        {/* stations */}
         {[
-          [59, 96],
-          [93, 58],
-          [127, 112],
-          [161, 38],
-          [195, 78],
+          [91, 130],
+          [230, 84],
+          [66, 76],
+          [185, 225],
+          [230, 153],
+          [266, 101],
+          [45, 200],
+          [120, 68],
         ].map(([cx, cy]) => (
-          <circle key={cx} cx={cx} cy={cy} r="4" fill="var(--canvas)" />
+          <circle key={`${cx}${cy}`} cx={cx} cy={cy} r="3.4" fill="var(--canvas)" strokeWidth="1.2" />
         ))}
-        <path d="M40,222 L200,222" strokeDasharray="3 5" strokeWidth="0.8" opacity="0.6" />
+        {/* interchange hubs */}
+        <circle cx="98" cy="122" r="8" fill="var(--canvas)" strokeWidth="1.4" />
+        <circle cx="98" cy="122" r="3.2" fill="url(#h-dense)" strokeWidth="0.8" />
+        <circle cx="165" cy="148" r="6" fill="var(--canvas)" strokeWidth="1.3" />
+        <circle cx="165" cy="148" r="2.4" fill="url(#h-dense)" strokeWidth="0.7" />
+        {/* compass */}
+        <circle cx="262" cy="30" r="14" strokeWidth="0.8" />
+        <path d="M262,18 L266,30 L262,27 L258,30 Z" fill="url(#h-dense)" strokeWidth="0.7" />
+        <path d="M262,42 L266,30 L262,33 L258,30 Z" fill="var(--canvas)" strokeWidth="0.7" />
+        {/* plate caption */}
+        <text x="14" y="228" fontSize="7.5" letterSpacing="1.6" fill="var(--ink)" stroke="none" fontFamily="Newsreader, serif">
+          FIG. 2 — RIDERSHIP BY LINE
+        </text>
+        <path d="M14,218 H118" strokeWidth="0.5" />
       </Pencil>
     </svg>
   );
 }
 
-function CoverWeb() {
+function CoverKnight() {
+  const body =
+    "M70,268 L170,268 L170,252 Q140,248 140,220 Q140,190 160,160 Q175,135 165,105 Q150,70 115,62 L108,45 L95,58 L80,55 L70,75 Q50,90 42,120 L48,132 L68,118 Q80,112 86,120 L82,150 Q110,165 108,200 Q106,240 70,252 Z";
+  const shade =
+    "M118,250 C120,230 128,210 138,182 C148,152 152,120 160,100 C166,112 170,130 162,150 C150,180 128,215 130,252 Z";
+  const mane = "M108,45 L115,62 Q150,70 165,105 Q158,96 148,84 Q136,70 118,66 Z";
   return (
-    <svg viewBox="0 0 260 200" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
-      <Pencil>
-        <path d="M130,64 C130,40 100,44 92,26 C84,8 60,16 40,12" strokeWidth="1" />
-        <g transform="translate(130 108) scale(1.55)">
-          <path d="M-40,-10 C-40,-22 -28,-24 -16,-20 L16,-20 C28,-24 40,-22 40,-10 L46,18 C48,30 36,34 28,24 L18,12 L-18,12 L-28,24 C-36,34 -48,30 -46,18 Z" />
-          <path d="M-35,-4 C-35,-14 -26,-16 -16,-14" opacity="0.5" strokeWidth="0.8" />
-          <path d="M-35,-3 H-29 V-9 H-23 V-3 H-17 V3 H-23 V9 H-29 V3 H-35 Z" fill="url(#hatch-dense)" strokeWidth="0.9" />
-          {[
-            [24, -8],
-            [32, 0],
-            [24, 8],
-            [16, 0],
-          ].map(([cx, cy], i) => (
-            <circle key={i} cx={cx} cy={cy} r="3.2" strokeWidth="0.9" fill={i === 0 ? "url(#hatch-dense)" : "none"} />
-          ))}
-          <circle cx="-9" cy="10" r="5" strokeWidth="0.9" />
-          <circle cx="9" cy="10" r="5" strokeWidth="0.9" />
-        </g>
-        <g transform="translate(212 46) rotate(14)">
-          <rect x="-15" y="-15" width="30" height="30" rx="5" fill="var(--canvas)" />
-          {[
-            [-7, -7],
-            [7, 7],
-            [0, 0],
-          ].map(([cx, cy], i) => (
-            <circle key={i} cx={cx} cy={cy} r="2.2" fill="var(--ink)" stroke="none" />
-          ))}
-        </g>
-        <path d={star(44, 168, 7, 3, 4)} strokeWidth="0.9" />
-        <path d={star(222, 160, 5, 2, 4)} strokeWidth="0.9" />
+    <svg viewBox="0 0 240 300" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
+      <Pencil width={1.15}>
+        {/* board squares */}
+        <rect x="18" y="274" width="51" height="18" fill="url(#h-cross)" strokeWidth="0.7" />
+        <rect x="69" y="274" width="51" height="18" fill="none" strokeWidth="0.7" />
+        <rect x="120" y="274" width="51" height="18" fill="url(#h-cross)" strokeWidth="0.7" />
+        <rect x="171" y="274" width="51" height="18" fill="none" strokeWidth="0.7" />
+        {/* piece */}
+        <path d={body} fill="var(--canvas)" strokeWidth="1.3" />
+        <path d={shade} fill="url(#h-mid)" stroke="none" />
+        <path d="M140,252 C136,226 146,196 156,170 C150,200 142,226 146,252 Z" fill="url(#h-dense)" stroke="none" />
+        <path d={mane} fill="url(#h-dense)" strokeWidth="0.8" />
+        <path d="M118,66 L124,74 L116,82 L124,90 L116,98 L124,106 L118,114" strokeWidth="0.8" />
+        <path d="M86,120 Q96,112 104,114" strokeWidth="0.8" />
+        <path d="M68,118 Q72,128 80,132" strokeWidth="0.8" />
+        {/* eye, nostril, mouth */}
+        <circle cx="88" cy="90" r="3" fill="var(--ink)" />
+        <path d="M84,84 Q88,80 94,82" strokeWidth="0.8" />
+        <path d="M52,118 Q56,116 58,120" strokeWidth="0.9" />
+        <path d="M46,128 L60,124" strokeWidth="0.9" />
+        {/* base */}
+        <path d="M62,268 H178" strokeWidth="1.4" />
+        <path d="M66,260 H174" strokeWidth="0.7" />
+        <path d="M60,268 Q120,276 180,268" strokeWidth="0.8" />
+        <path d="M140,252 H170 L170,268 H140 Z" fill="url(#h-dense)" stroke="none" opacity="0.7" />
       </Pencil>
     </svg>
   );
@@ -301,40 +345,62 @@ function CoverWeb() {
 
 function CoverWatch() {
   return (
-    <svg viewBox="0 0 220 290" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
-      <Pencil>
+    <svg viewBox="0 0 240 300" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
+      <Pencil width={1.15}>
         {/* straps */}
-        <path d="M78,52 L84,8 H136 L142,52" fill="url(#hatch)" />
-        <path d="M78,238 L84,282 H136 L142,238" fill="url(#hatch)" />
-        <path d="M88,20 H132 M89,30 H131 M88,262 H132 M89,272 H131" strokeWidth="0.7" opacity="0.6" />
-        {/* case + crown + button */}
-        <rect x="56" y="50" width="108" height="190" rx="30" fill="var(--canvas)" />
-        <rect x="66" y="60" width="88" height="170" rx="22" strokeWidth="1" />
-        <rect x="164" y="104" width="9" height="24" rx="3" fill="url(#hatch-dense)" />
-        <rect x="165" y="140" width="6" height="30" rx="2" />
-        {/* screen: mic + recording waveform */}
-        <rect x="88" y="80" width="18" height="30" rx="9" />
-        <path d="M82,100 Q82,120 97,120 Q112,120 112,100 M97,120 L97,130 M89,130 H105" />
-        <path d="M78,154 L84,154 L88,144 L94,166 L100,140 L106,170 L112,148 L117,160 L121,154 L142,154" strokeWidth="1.2" />
-        <circle cx="132" cy="92" r="5" fill="url(#hatch-dense)" />
-        <path d="M80,190 H140 M80,202 H128 M80,214 H134" strokeWidth="0.8" opacity="0.55" />
-        {/* siri sparkle + note */}
-        <path d={star(30, 70, 9, 3, 4)} strokeWidth="0.9" />
-        <path d={star(196, 210, 6, 2.5, 4)} strokeWidth="0.9" />
-        <path d="M14,214 Q30,200 46,214 Q30,228 14,214" strokeWidth="0.8" opacity="0.6" />
+        <path d="M84,84 L80,20 Q80,12 88,12 L152,12 Q160,12 160,20 L156,84 Z" fill="url(#h-sparse)" />
+        <path d="M84,220 L80,284 Q80,292 88,292 L152,292 Q160,292 160,284 L156,220 Z" fill="url(#h-sparse)" />
+        <path d="M86,30 Q120,26 154,30 M85,44 Q120,40 155,44 M85,58 Q120,54 155,58" strokeWidth="0.55" opacity="0.6" />
+        {[232, 246, 260].map((cy) => (
+          <circle key={cy} cx="120" cy={cy} r="2.6" fill="var(--canvas)" strokeWidth="0.8" />
+        ))}
+        <path d="M94,276 H146" strokeWidth="0.7" />
+        {/* case + bezel */}
+        <rect x="62" y="84" width="116" height="136" rx="34" fill="var(--canvas)" strokeWidth="1.4" />
+        <path
+          d="M62,118 Q62,84 96,84 H144 Q178,84 178,118 V186 Q178,220 144,220 H96 Q62,220 62,186 Z M74,120 Q74,96 98,96 H142 Q166,96 166,120 V184 Q166,208 142,208 H98 Q74,208 74,184 Z"
+          fill="url(#h-dense)"
+          fillRule="evenodd"
+          stroke="none"
+        />
+        <path d="M62,186 Q62,220 96,220 H144 Q166,220 170,210 Q150,214 100,214 Q72,212 62,186 Z" fill="url(#h-cross)" stroke="none" opacity="0.8" />
+        <rect x="74" y="96" width="92" height="112" rx="24" fill="var(--canvas)" strokeWidth="1" />
+        <path d="M70,120 Q72,92 98,90" stroke="var(--canvas)" strokeWidth="1.6" opacity="0.9" />
+        {/* crown + button */}
+        <rect x="178" y="118" width="10" height="26" rx="3" fill="url(#h-dense)" strokeWidth="0.9" />
+        <path d="M181,122 V140 M184,122 V140" strokeWidth="0.5" opacity="0.6" />
+        <rect x="179" y="156" width="7" height="34" rx="2" fill="url(#h-mid)" strokeWidth="0.9" />
+        {/* screen: recording */}
+        <circle cx="150" cy="114" r="4" fill="var(--ink)" />
+        <text x="86" y="118" fontSize="9" fill="var(--ink)" stroke="none" fontFamily="Newsreader, serif" letterSpacing="0.8">
+          0:19
+        </text>
+        <path d="M84,152 L92,152 L98,140 L104,166 L110,130 L116,172 L122,144 L128,160 L134,150 L156,150" strokeWidth="1.6" />
+        <rect x="88" y="182" width="64" height="14" rx="7" fill="url(#h-mid)" strokeWidth="0.9" />
+        <path d="M110,189 H130" stroke="var(--canvas)" strokeWidth="1.4" />
       </Pencil>
     </svg>
   );
 }
 
-const COVERS = {
-  hci: CoverHci,
-  viz: CoverViz,
-  web: CoverWeb,
+const DRAWINGS = {
+  hci: CoverButterfly,
+  viz: CoverTransit,
+  web: CoverKnight,
   nb: CoverWatch,
 };
 
-export function Cover({ id }) {
-  const Drawing = COVERS[id];
+// Renders a project's cover: your own image if the project sets `cover`, else the engraved drawing.
+export function Cover({ project }) {
+  if (project.cover) {
+    return (
+      <img
+        src={`${import.meta.env.BASE_URL}${project.cover.replace(/^\//, "")}`}
+        alt=""
+        className="h-full w-full object-contain"
+      />
+    );
+  }
+  const Drawing = DRAWINGS[project.id];
   return Drawing ? <Drawing /> : null;
 }
