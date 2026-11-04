@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Catalogue, Columns, Figure, Lightbox, List, LiveFrame, Meta, Prose, PullQuote, Section, Stat, Steps, TextLink } from "./catalogue.jsx";
-import { Cover, SketchFrame } from "./sketch.jsx";
 
 const asset = (file) => `${import.meta.env.BASE_URL}${file}`;
 
-const hciScreens = [
-  { src: asset("hci1.png"), alt: "Overall Figma layout of screens", caption: "Overall Figma layout of screens" },
-  { src: asset("hci2.png"), alt: "Events page", caption: "Events page" },
-  { src: asset("hci3.png"), alt: "Home page after syncing music", caption: "Home page after syncing music" },
+const faceScreens = [
+  { src: asset("face-home.jpg"), alt: "Face Analyzer home screen", caption: "Home: one button, and a promise that the photo stays on your device" },
+  { src: asset("face-results.jpg"), alt: "Results overview", caption: "Results: face shape, symmetry score, and the measured outline" },
+  { src: asset("face-features.jpg"), alt: "Feature breakdown", caption: "Features: every measurement placed on a scale against a typical face" },
 ];
 
 const nbScreens = [
@@ -33,143 +32,127 @@ const nbScreens = [
   },
 ];
 
-export function HciStudy({ project, onClose }) {
+export function FaceStudy({ onClose }) {
   const [expanded, setExpanded] = useState(null);
+  const url = "https://fifixu01.github.io/face-analyzer/";
   return (
     <Catalogue
       number="01"
       total="04"
-      kind="HCI case study · Course project"
-      title="Social Butterflies"
-      lede="A music-based app for low-pressure social connection."
+      kind="Personal project · Computer vision"
+      title="Face Analyzer"
+      lede="A private, in-browser face analysis app. See how much you mog."
       onClose={onClose}
     >
-      <Section n="Overview" title="Bridging the gap">
+      <Section n="Overview" title="The project">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-[1fr_15rem]">
           <div>
             <Prose>
               <p>
-                Social Butterflies explored how Northeastern students can turn shared music interests, communities, and concerts into safer in-person connection. The main insight was that many students are not lacking opportunities to meet people; they lack clear, socially safe signals that make initiating feel mutual instead of awkward or one-sided.
+                Face Analyzer takes one photo from your camera and breaks your face down into its shape, symmetry, proportions, and features: eye corner tilt, brow arch, nose width, cupid’s bow, and more. Every result comes with a plain-language description and a scale showing where you sit compared with a typical face.
+              </p>
+              <p>
+                Everything runs in the browser. The photo is analyzed on your device and never uploaded, which shaped the whole product: there is no backend, no account, and no upload button.
               </p>
             </Prose>
             <Meta
               className="mt-8"
               items={[
-                ["Methods", "Needfinding · Personas · Lo-fi prototype · Hi-fi prototype"],
-                ["Setting", "Northeastern University"],
+                ["Built with", "React · TypeScript · MediaPipe Face Landmarker · Tailwind · Motion"],
+                ["Link", <TextLink href={url}>Open the live site</TextLink>],
               ]}
             />
           </div>
-          <figure>
-            <SketchFrame variant="ornate" seed={21} className="aspect-[4/5] w-full">
-              <div className="h-full w-full p-5">
-                <Cover project={project} />
-              </div>
-            </SketchFrame>
-            <figcaption className="mt-4 font-serif text-[14px] leading-relaxed text-graphite">
-              <span className="italic text-pencil">Plate — </span>
-              Designing safe entry points for students to move from shared interests to comfortable in-person connection.
-            </figcaption>
-          </figure>
+          <Figure
+            src={asset("face-mobile.jpg")}
+            alt="Face Analyzer results on a phone"
+            caption="Designed phone-first, since most people open it from a link on their phone."
+            aspect="aspect-[9/16]"
+            fit="object-cover object-top"
+            variant="ornate"
+            seed={21}
+            onExpand={setExpanded}
+          />
         </div>
       </Section>
 
-      <Section n="01" title="The problem">
-        <Columns
-          items={[
-            {
-              title: "Problem",
-              text: "Students wanted meaningful friendships but hesitated to initiate because they feared awkwardness, rejection, or misreading intentions.",
-            },
-            {
-              title: "Core insight",
-              text: "The barrier was not simply loneliness or lack of events. It was social ambiguity: not knowing whether another person was open to the same level of connection.",
-            },
-            {
-              title: "Design goal",
-              text: "Create structured signals of openness through music interests, communities, friendship levels, and safer meetup planning.",
-            },
-          ]}
+      <Section n="01" title="Live">
+        <LiveFrame
+          src={url}
+          title="Face Analyzer live preview"
+          caption="The deployed app. Allow camera access to try it; the photo never leaves your browser."
+          heightClass="h-[640px]"
+          allow="camera"
+          seed={120}
         />
       </Section>
 
-      <Section n="02" title="From research to prototype">
+      <Section n="02" title="How it works">
         <Steps
           items={[
             {
               n: "i",
-              title: "Needfinding + observations",
-              text: "We used interviews, persona work, and campus observations to understand why students hesitate in shared spaces. Dining hall observations were especially useful because they showed behavior that interviews alone might miss, such as students using phones as barriers or avoiding half-full tables.",
+              title: "Guided capture",
+              text: "The camera view checks lighting, distance, and head angle in real time, and only takes the photo once you have held still in a good position, so results are not thrown off by a tilted head or a bad frame.",
             },
             {
               n: "ii",
-              title: "Point of view",
-              text: "We framed the problem around students who want friendship but need a socially safe way to move from passive coexistence or online interaction into in-person connection without misreading expectations.",
+              title: "478 landmarks",
+              text: "MediaPipe’s Face Landmarker maps 478 points across the face and irises. The face is levelled by the eye line so every measurement is taken straight on.",
             },
             {
               n: "iii",
-              title: "Task analysis",
-              text: "We broke down actions such as syncing music, exploring communities, starting low-pressure conversations, coordinating events, and managing boundaries during first meetups.",
+              title: "Face shape from the outline",
+              text: "Instead of a few ratios, the outline is sampled at 19 heights from forehead to chin and compared with six shape profiles (oval, round, square, oblong, heart, diamond). You get the main shape plus your top three matches with percentages.",
             },
             {
               n: "iv",
-              title: "Low-fi prototyping",
-              text: "Our early paper prototype helped us test structure before committing to visuals. We discovered issues around unclear sync flows, visual affordance problems, and the need for direct one-on-one coordination from event spaces.",
+              title: "Features, described",
+              text: "Eyes, brows, nose, and lips are each measured several ways and translated into words like “upturned soft almond eyes” or “defined cupid’s bow”, with a short explanation of what was measured.",
             },
             {
               n: "v",
-              title: "High-fi redesign",
-              text: "The high-fidelity version separated the home and profile pages, simplified event cards, added quick message prompts, clarified communities, and added stronger safety features like blocking.",
-            },
-            {
-              n: "vi",
-              title: "User testing + reflection",
-              text: "Participants completed the major tasks successfully, but testing revealed confusion around edit/save behavior, community posting after joining, and navigation between profile/settings. These became clear future improvement directions.",
+              title: "Shareable card",
+              text: "Results can be saved as a share card in four color styles, with a few short phrases per feature so it reads at a glance.",
             },
           ]}
         />
       </Section>
 
-      <Section n="03" title="Prototype screens">
+      <Section n="03" title="Screens">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
-          {hciScreens.map((shot, i) => (
+          {faceScreens.map((shot, i) => (
             <Figure key={shot.src} n={i + 1} {...shot} seed={90 + i} onExpand={setExpanded} />
           ))}
         </div>
       </Section>
 
-      <Section n="04" title="Features and what’s next">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-          <List
-            title="Key features"
-            items={[
-              <><strong>Music syncing</strong> helps users express taste without starting from nothing.</>,
-              <><strong>Communities</strong> let users engage around shared interests before one-on-one messaging.</>,
-              <><strong>Friendship levels</strong> make connection strength more visible and less ambiguous.</>,
-              <><strong>Quick messages</strong> lower the effort of starting a conversation.</>,
-              <><strong>Meetup suggestions</strong> connect people through shared concerts and events.</>,
-            ]}
-          />
-          <List
-            title="Future improvements"
-            items={[
-              "Make the home page more distinct from the profile page with more personalized content.",
-              "Clarify what friendship levels mean and how users progress through them.",
-              "Add onboarding so first-time users understand profile setup, communities, messaging, and meetups.",
-              "Improve feedback after joining communities or adding events so the user knows the action worked.",
-              "Test with more skeptical users and run longer-term studies to see whether the app actually supports real-world connection.",
-            ]}
-          />
-        </div>
+      <Section n="04" title="Iterating on accuracy">
+        <Columns
+          items={[
+            {
+              title: "The problem",
+              text: "Early testers almost all came out as Round or Heart. The thresholds were my own guesses, and they were off-center, so ordinary faces landed at the extremes.",
+            },
+            {
+              title: "The fix",
+              text: "I calibrated every measurement against MediaPipe’s canonical face model, so an average face now reads as Oval and sits mid-scale on every feature, and only real differences push a result toward an edge.",
+            },
+            {
+              title: "Honest limits",
+              text: "I removed measurements like nose tip projection and bridge profile. Those are side-profile traits, and a front-facing photo cannot judge them, so showing them would have been made-up precision.",
+            },
+          ]}
+        />
       </Section>
 
       <Section n="05" title="What I learned">
         <PullQuote>
-          Awkwardness is not just a personal weakness or lack of confidence; it often comes from uncertainty, safety concerns, and the hidden work of reading another person’s intentions.
+          People trust a result more when it explains itself. A label alone feels like a verdict; a label with what was measured and where you sit on the scale feels like information.
         </PullQuote>
         <Prose>
           <p>
-            This project changed how I think about designing for social interaction. A stronger design does not only create more opportunities to meet people. It makes the first step feel clearer, safer, and more mutual.
+            The design went through a full polish pass: a flat, low-contrast dark palette instead of glassy cards, a bigger symmetry score, and simpler face-shape results. Testing on narrow phones down to 320px caught layout breaks that never showed up on desktop.
           </p>
         </Prose>
       </Section>
@@ -272,7 +255,7 @@ export function WebStudy({ onClose }) {
           items={[
             {
               title: "Full-stack app",
-              text: "Unlike the Figma-based HCI project, this was a functional deployed website with frontend, backend, authentication, and persistent user data.",
+              text: "Unlike a Figma prototype, this was a functional deployed website with frontend, backend, authentication, and persistent user data.",
             },
             {
               title: "Community features",

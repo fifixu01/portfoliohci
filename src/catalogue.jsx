@@ -179,11 +179,11 @@ export function Figure({ n, src, alt, caption, onExpand, aspect = "aspect-[4/3]"
   );
 }
 
-export function LiveFrame({ src, title, caption, heightClass = "h-[560px]", seed = 9 }) {
+export function LiveFrame({ src, title, caption, heightClass = "h-[560px]", seed = 9, allow }) {
   return (
     <figure>
       <SketchFrame variant="thin" seed={seed}>
-        <iframe src={src} title={title} className={`${heightClass} w-full bg-white`} />
+        <iframe src={src} title={title} allow={allow} className={`${heightClass} w-full bg-white`} />
       </SketchFrame>
       <figcaption className="mt-4 font-serif text-[14px] leading-relaxed text-graphite">
         <span className="italic text-pencil">Live — </span>

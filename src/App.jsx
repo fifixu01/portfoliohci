@@ -2,17 +2,17 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Cover, HangingWire, Plaque, SketchDefs, SketchFrame } from "./sketch.jsx";
-import { HciStudy, NbStudy, VizStudy, WebStudy } from "./studies.jsx";
+import { FaceStudy, NbStudy, VizStudy, WebStudy } from "./studies.jsx";
 
 // Add `cover: "my-drawing.png"` (a file in public/) to any project to replace its engraved drawing.
 const projects = [
-  { id: "hci", title: "Social Butterflies", meta: "HCI case study", frame: "ornate", depth: 1 },
+  { id: "face", title: "Face Analyzer", meta: "Computer vision · Web app", frame: "ornate", depth: 1 },
   { id: "viz", title: "MBTA Data Visualization", meta: "Interactive storytelling", frame: "matted", depth: 0.45 },
   { id: "web", title: "GameNite", meta: "Full-stack project", frame: "classic", depth: 0.7 },
   { id: "nb", title: "Notability on Your Wrist", meta: "Hackathon · 4th place", frame: "thin", depth: 0.3 },
 ];
 
-const STUDIES = { hci: HciStudy, viz: VizStudy, web: WebStudy, nb: NbStudy };
+const STUDIES = { face: FaceStudy, viz: VizStudy, web: WebStudy, nb: NbStudy };
 
 function useMediaQuery(query) {
   const [matches, setMatches] = useState(() => (typeof window !== "undefined" ? window.matchMedia(query).matches : true));
@@ -111,7 +111,7 @@ function Intro({ progress }) {
 }
 
 function Wall({ progress, onOpen, stacked }) {
-  const [hci, viz, web, nb] = projects;
+  const [face, viz, web, nb] = projects;
   return (
     <section className="relative flex min-h-screen w-screen items-center justify-center px-8 py-24 md:px-16 md:py-0 md:pb-[9vh]">
       <div className="w-full max-w-6xl">
@@ -125,7 +125,7 @@ function Wall({ progress, onOpen, stacked }) {
 
         {stacked ? (
           <div className="flex flex-col items-center gap-24">
-            <WallFrame project={hci} index={0} progress={progress} onOpen={onOpen} sizeClass="h-[22rem] w-[17rem]" parallax={false} />
+            <WallFrame project={face} index={0} progress={progress} onOpen={onOpen} sizeClass="h-[22rem] w-[17rem]" parallax={false} />
             <WallFrame project={viz} index={1} progress={progress} onOpen={onOpen} sizeClass="h-[13rem] w-[17rem]" parallax={false} />
             <WallFrame project={web} index={2} progress={progress} onOpen={onOpen} sizeClass="h-[16rem] w-[13rem]" parallax={false} />
             <WallFrame project={nb} index={3} progress={progress} onOpen={onOpen} sizeClass="h-[20rem] w-[15rem]" parallax={false} />
@@ -133,7 +133,7 @@ function Wall({ progress, onOpen, stacked }) {
         ) : (
           // salon hang: one hero, a landscape over a small portrait, a tall piece on the right
           <div className="grid grid-cols-[19rem_13rem_14.5rem] items-end justify-between gap-x-10">
-            <WallFrame project={hci} index={0} progress={progress} onOpen={onOpen} sizeClass="h-[24rem] w-[19rem]" className="row-span-2" />
+            <WallFrame project={face} index={0} progress={progress} onOpen={onOpen} sizeClass="h-[24rem] w-[19rem]" className="row-span-2" />
             <WallFrame project={viz} index={1} progress={progress} onOpen={onOpen} sizeClass="h-[10rem] w-[13rem]" className="self-end" />
             <WallFrame project={nb} index={3} progress={progress} onOpen={onOpen} sizeClass="h-[19rem] w-[14rem]" className="row-span-2 mb-6 self-center" />
             <WallFrame project={web} index={2} progress={progress} onOpen={onOpen} sizeClass="h-[13rem] w-[10.5rem]" className="ml-8 mt-16 self-start" />

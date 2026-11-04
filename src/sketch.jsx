@@ -199,57 +199,65 @@ export function Plaque({ title, meta, className = "" }) {
 // To replace any of these with your own drawing, drop a PNG/SVG in public/ and set
 // `cover: "your-file.png"` on the project in App.jsx; <Cover /> below will use it.
 
-function CoverButterfly() {
-  const fore =
-    "M126,146 C150,118 190,84 212,80 C224,80 226,96 218,112 C210,128 186,146 160,154 C148,158 134,156 126,146 Z";
-  const hind =
-    "M128,160 C150,158 184,166 200,186 C210,200 204,220 190,222 C170,224 146,206 132,180 C129,174 128,166 128,160 Z";
-  const foreInner = "M126,146 C140,130 162,116 180,110 C172,128 156,144 142,152 Z";
-  const hindInner = "M128,160 C146,160 168,172 180,190 C166,196 148,188 136,176 Z";
-  const wing = (
-    <>
-      <path d={fore} fill="url(#h-sparse)" />
-      <path d={foreInner} fill="url(#h-dense)" />
-      <path d={hind} fill="url(#h-sparse)" />
-      <path d={hindInner} fill="url(#h-dense)" />
-      {/* outer margin band */}
-      <path d="M212,80 C224,80 226,96 218,112 C210,128 186,146 160,154 C170,146 196,126 206,108 C212,96 212,86 212,80 Z" fill="url(#h-cross)" />
-      <path d="M200,186 C210,200 204,220 190,222 C180,222 170,218 160,212 C176,214 192,210 196,198 C198,192 198,188 200,186 Z" fill="url(#h-cross)" />
-      {/* veins */}
-      <g strokeWidth="0.75">
-        <path d="M128,148 Q168,110 212,86" />
-        <path d="M128,148 Q170,122 216,104" />
-        <path d="M128,148 Q166,136 206,124" />
-        <path d="M128,148 Q156,146 184,142" />
-        <path d="M130,162 Q164,172 198,190" />
-        <path d="M130,162 Q162,184 198,210" />
-        <path d="M130,162 Q154,196 184,220" />
-        <path d="M130,162 Q146,190 160,210" />
-      </g>
-      {/* pale spots near the tip */}
-      {[
-        [205, 95, 3.5, 2.2, -40],
-        [198, 108, 3, 2, -40],
-        [188, 120, 2.6, 1.8, -40],
-      ].map(([cx, cy, rx, ry, rot]) => (
-        <ellipse key={cx} cx={cx} cy={cy} rx={rx} ry={ry} transform={`rotate(${rot} ${cx} ${cy})`} fill="var(--canvas)" strokeWidth="0.7" />
-      ))}
-    </>
+// A face plate with its outline sampled into points and measured at four heights.
+function CoverFace() {
+  const head = "M120,46 C162,46 184,82 184,128 C184,170 166,206 142,226 C134,233 127,236 120,236 C113,236 106,233 98,226 C74,206 56,170 56,128 C56,82 78,46 120,46 Z";
+  // points along the outline, like the face mesh contour
+  const outline = Array.from({ length: 30 }, (_, i) => {
+    const t = (i / 30) * Math.PI * 2;
+    const y = 141 - Math.cos(t) * 95;
+    const taper = y > 150 ? 1 - ((y - 150) / 86) ** 1.6 * 0.72 : 1;
+    return [120 + Math.sin(t) * 64 * taper, y];
+  });
+  const widths = [
+    [84, 50],
+    [128, 64],
+    [190, 44],
+    [214, 27],
+  ];
+  const eye = (cx, flip) => (
+    <g transform={`translate(${cx} 124) scale(${flip ? -1 : 1} 1)`}>
+      <path d="M-14,1 C-8,-7 6,-8 13,-2 C6,5 -6,6 -14,1 Z" fill="var(--canvas)" strokeWidth="1" />
+      <circle cx="0" cy="-1" r="4.2" fill="url(#h-dense)" strokeWidth="0.8" />
+      <path d="M-16,-12 C-8,-19 6,-19 15,-13" strokeWidth="2.2" />
+    </g>
   );
   return (
     <svg viewBox="0 0 240 300" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
       <Pencil width={1.1}>
-        <ellipse cx="120" cy="252" rx="68" ry="7" fill="url(#h-horiz)" stroke="none" opacity="0.5" />
-        {wing}
-        <g transform="translate(240 0) scale(-1 1)">{wing}</g>
-        {/* body */}
-        <path d="M114,158 C112,185 118,206 120,208 C122,206 128,185 126,158 Z" fill="url(#h-dense)" />
-        <ellipse cx="120" cy="150" rx="6.5" ry="13" fill="url(#h-mid)" />
-        <circle cx="120" cy="138" r="5.2" fill="url(#h-mid)" />
-        <path d="M117,134 C110,120 102,112 92,106 M123,134 C130,120 138,112 148,106" strokeWidth="0.9" />
-        <circle cx="91" cy="105" r="1.4" fill="var(--ink)" />
-        <circle cx="149" cy="105" r="1.4" fill="var(--ink)" />
-        <path d="M115,170 H125 M115,178 H125 M116,186 H124 M117,194 H123" strokeWidth="0.6" />
+        {/* neck + shoulders */}
+        <path d="M100,226 L98,256 C70,262 44,272 30,292 H210 C196,272 170,262 142,256 L140,226" fill="var(--canvas)" />
+        <path d="M140,236 L142,256 C162,260 180,266 196,278 C176,272 156,266 134,262 Z" fill="url(#h-mid)" stroke="none" />
+        {/* head, shaded on the right */}
+        <path d={head} fill="var(--canvas)" strokeWidth="1.3" />
+        <path d="M150,58 C176,74 184,104 184,128 C184,170 166,206 142,226 C156,200 168,170 168,130 C168,98 162,74 150,58 Z" fill="url(#h-sparse)" stroke="none" />
+        {/* hair */}
+        <path d="M58,118 C52,70 84,34 124,36 C164,38 190,70 182,118 C176,86 160,66 128,64 C100,64 80,80 70,104 C66,96 62,102 58,118 Z" fill="url(#h-cross)" strokeWidth="1" />
+        {/* centre line */}
+        <path d="M120,40 V242" strokeWidth="0.6" strokeDasharray="2 3" />
+        {/* features */}
+        {eye(96, false)}
+        {eye(144, true)}
+        <path d="M117,128 C116,146 112,160 108,168 C112,174 128,174 132,168 C128,160 124,146 123,128" strokeWidth="0.9" />
+        <path d="M110,168 C114,166 116,170 120,170 C124,170 126,166 130,168" strokeWidth="0.9" />
+        <path d="M100,192 C108,186 116,186 120,189 C124,186 132,186 140,192 C130,196 110,196 100,192 Z" fill="url(#h-mid)" strokeWidth="1" />
+        <path d="M102,201 C112,207 128,207 138,201 C130,198 110,198 102,201 Z" fill="url(#h-sparse)" strokeWidth="0.8" />
+        {/* width measurements with end ticks */}
+        {widths.map(([y, half]) => (
+          <g key={y} strokeWidth="0.75">
+            <path d={`M${120 - half},${y} H${120 + half}`} strokeDasharray="5 2.5" />
+            <path d={`M${120 - half},${y - 4} V${y + 4} M${120 + half},${y - 4} V${y + 4}`} />
+          </g>
+        ))}
+        {/* sampled outline points */}
+        {outline.map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r="1.9" fill="var(--ink)" stroke="none" />
+        ))}
+        {/* plate caption */}
+        <text x="16" y="24" fontSize="7.5" letterSpacing="1.6" fill="var(--ink)" stroke="none" fontFamily="Newsreader, serif">
+          FIG. 1 — 478 POINTS
+        </text>
+        <path d="M16,30 H96" strokeWidth="0.5" />
       </Pencil>
     </svg>
   );
@@ -384,7 +392,7 @@ function CoverWatch() {
 }
 
 const DRAWINGS = {
-  hci: CoverButterfly,
+  face: CoverFace,
   viz: CoverTransit,
   web: CoverKnight,
   nb: CoverWatch,
