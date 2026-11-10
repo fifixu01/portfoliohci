@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { SketchDefs } from "./sketch.jsx";
 import { Desk } from "./desk/Desk.jsx";
+import { PaperTransition } from "./desk/paper.jsx";
 import { FaceStudy, NbStudy, VizStudy, WebStudy } from "./studies.jsx";
 
 // Add `cover: "my-drawing.png"` (a file in public/) to any project to replace its engraved drawing.
@@ -16,13 +17,11 @@ const projects = [
 const STUDIES = { face: FaceStudy, viz: VizStudy, web: WebStudy, nb: NbStudy };
 
 // Clip-path inset that matches a frame's on-screen rectangle, so the study opens out of its frame.
-function insetFor(rect) {
-  if (!rect) return "inset(40% 40% 40% 40% round 4px)";
-  return `inset(${rect.top}px ${window.innerWidth - rect.right}px ${window.innerHeight - rect.bottom}px ${rect.left}px round 4px)`;
-}
-
 export default function App() {
+  const calm = useReducedMotion();
   const [open, setOpen] = useState(null); // { project, rect }
+  const [paper, setPaper] = useState(null); // "unfold" | "crumple" | null
+  const [showStudy, setShowStudy] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -31,6 +30,31 @@ export default function App() {
     };
   }, [open]);
 
+  const openProject = (project, rect) => {
+    if (open || paper) return;
+    setOpen({ project, rect });
+    if (calm) setShowStudy(true);
+    else setPaper("unfold");
+  };
+
+  const closeProject = () => {
+    if (paper) return;
+    setShowStudy(false);
+    if (calm) setOpen(null);
+    else setPaper("crumple");
+  };
+
+  const onPaperDone = () => {
+    if (paper === "unfold") {
+      setShowStudy(true);
+      // keep the flat sheet underneath until the page has faded in over it
+      setTimeout(() => setPaper(null), 400);
+    } else {
+      setPaper(null);
+      setOpen(null);
+    }
+  };
+
   const Study = open ? STUDIES[open.project.id] : null;
 
   return (
@@ -38,26 +62,29 @@ export default function App() {
       <SketchDefs />
       <div className="paper-grain" aria-hidden="true" />
 
-      <Desk projects={projects} onOpen={(project, rect) => setOpen({ project, rect })} />
+      <Desk projects={projects} onOpen={openProject} />
+
+      {paper && open && (
+        <PaperTransition
+          key={paper}
+          mode={paper}
+          rect={open.rect}
+          seed={projects.findIndex((p) => p.id === open.project.id) * 17 + 5}
+          onDone={onPaperDone}
+        />
+      )}
 
       <AnimatePresence>
-        {open && (
+        {showStudy && Study && (
           <motion.div
             key={open.project.id}
-            initial={{ clipPath: insetFor(open.rect) }}
-            animate={{ clipPath: "inset(0px 0px 0px 0px round 0px)" }}
-            exit={{ clipPath: insetFor(open.rect) }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className="fixed inset-0 z-[100] overflow-y-auto bg-paper"
           >
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, delay: 0.25 }}
-            >
-              <Study project={open.project} onClose={() => setOpen(null)} />
-            </motion.div>
+            <Study project={open.project} onClose={closeProject} />
           </motion.div>
         )}
       </AnimatePresence>
