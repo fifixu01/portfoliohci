@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { BusinessCard, Die, GameCards, Mug, Notebook, Pencil, Polaroid, StickyNote, SubwayMap, Watch } from "./objects.jsx";
 import { u } from "./units.js";
 import { PlantShadow, WindowLight } from "./ambient.jsx";
@@ -33,7 +33,7 @@ function useMediaQuery(query) {
   return matches;
 }
 
-function DeskItem({ item, project, index, z, desktop, deskRef, calm, onFront, onOpen, onMoved }) {
+function DeskItem({ item, project, index, z, desktop, deskRef, calm, onFront, onOpen }) {
   const ref = useRef(null);
   const dragged = useRef(false);
   const { Comp } = item;
@@ -64,7 +64,6 @@ function DeskItem({ item, project, index, z, desktop, deskRef, calm, onFront, on
       }}
       onDragStart={() => {
         dragged.current = true;
-        onMoved();
       }}
       onClick={open}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())}
@@ -84,7 +83,6 @@ export function Desk({ projects, onOpen }) {
   const calm = useReducedMotion();
   const desktop = useMediaQuery("(min-width: 900px)");
   const [order, setOrder] = useState(() => ITEMS.map((i) => i.id));
-  const [moved, setMoved] = useState(false);
   const byId = Object.fromEntries(projects.map((p) => [p.id, p]));
 
   const toFront = (id) => setOrder((o) => (o[o.length - 1] === id ? o : [...o.filter((x) => x !== id), id]));
@@ -109,24 +107,27 @@ export function Desk({ projects, onOpen }) {
           calm={calm}
           onFront={toFront}
           onOpen={onOpen}
-          onMoved={() => setMoved(true)}
         />
       ))}
 
-      <AnimatePresence>
-        {desktop && !moved && (
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8, transition: { duration: 0.4 } }}
-            transition={{ delay: 1.4, duration: 0.6 }}
-            className="pointer-events-none absolute bottom-[3.5vh] right-[4vw] z-[45] font-hand text-graphite"
-            style={{ fontSize: u(1.5) }}
-          >
-            pick things up and move them around · click a project to look closer
-          </motion.p>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, duration: 0.6 }}
+        className={`pointer-events-none z-[45] font-hand leading-[1.25] text-ink ${
+          desktop ? "absolute bottom-[3vh] right-[3.5vw] text-right" : "order-first -mb-[calc(var(--u)*2)] px-6 text-center"
+        }`}
+        style={{ fontSize: desktop ? u(1.75) : u(2) }}
+      >
+        {desktop ? (
+          <>
+            <p>move things around,</p>
+            <p>click on anything with a label to see my projects</p>
+          </>
+        ) : (
+          <p>tap anything with a label to see my projects</p>
         )}
-      </AnimatePresence>
+      </motion.div>
     </section>
   );
 }
