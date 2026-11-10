@@ -15,7 +15,7 @@ export default {
       fontFamily: {
         display: ['"Fraunces"', "ui-serif", "Georgia", "serif"],
         serif: ['"Newsreader"', "ui-serif", "Georgia", "serif"],
-        hand: ['"Nothing You Could Do"', "cursive"],
+        hand: ['"Gochi Hand"', "cursive"],
       },
       boxShadow: {
         frame:

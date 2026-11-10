@@ -104,3 +104,156 @@ body {
 .hairline {
   border-top: 1px solid var(--rule);
 }
+
+/* ---------- the desk ---------- */
+
+.desk {
+  --u: min(1vw, 1.65vh);
+  --desk: #d8cdb9;
+  background-color: var(--desk);
+  /* pale ash wood: long grain stretched horizontally */
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='900'><filter id='g' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.0018 0.06' numOctaves='4' seed='9' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.36  0 0 0 0 0.28  0 0 0 0 0.19  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"),
+    linear-gradient(to bottom, #ddd3c0, #d2c6b0);
+  background-size: 1600px 900px, 100% 100%;
+  background-blend-mode: multiply;
+}
+@media (max-width: 899px) {
+  .desk {
+    --u: 2.7vw;
+  }
+}
+
+.desk-item {
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+.desk-item[data-project] {
+  cursor: pointer;
+}
+.desk-item:focus-visible {
+  outline: 1.5px dashed var(--accent);
+  outline-offset: 8px;
+}
+@media (max-width: 899px) {
+  .desk-item {
+    touch-action: auto;
+    cursor: default;
+  }
+}
+
+/* Light falls from the window on the left; the far corners sit in shade. */
+.desk-shade {
+  mix-blend-mode: multiply;
+  background:
+    radial-gradient(120% 95% at 40% 35%, transparent 45%, rgba(70, 52, 32, 0.28) 100%),
+    linear-gradient(100deg, rgba(255, 255, 255, 0) 55%, rgba(70, 52, 32, 0.08));
+}
+.window-pane {
+  border-radius: 4px;
+  background: rgba(255, 230, 182, 0.5);
+  filter: blur(22px);
+}
+.plant-shadow {
+  color: rgba(52, 42, 30, 0.2);
+  mix-blend-mode: multiply;
+  filter: blur(7px);
+}
+
+.tape {
+  padding: 0.42em 0.95em 0.38em;
+  background: rgba(238, 230, 208, 0.88);
+  box-shadow: 0 1px 2px rgba(30, 26, 20, 0.18);
+  clip-path: polygon(0 4%, 3% 0, 6% 6%, 10% 1%, 90% 0, 94% 5%, 97% 0, 100% 6%, 100% 94%, 97% 100%, 94% 95%, 90% 100%, 10% 99%, 6% 94%, 3% 100%, 0 95%, 1.5% 50%);
+}
+
+.notebook {
+  background-color: #f6f3ec;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 calc(var(--u) * 2.1 - 1px), rgba(110, 130, 160, 0.2) calc(var(--u) * 2.1 - 1px) calc(var(--u) * 2.1));
+  background-position: 0 calc(var(--u) * 1.1);
+  border-radius: 2px 6px 6px 2px;
+}
+
+.sticky-note {
+  background: linear-gradient(to bottom, #e5d58c, #efe2a0 22%, #f1e6aa);
+  border-radius: 1px;
+}
+
+.business-card {
+  background: #f8f6f0;
+  border-radius: 3px;
+}
+
+.polaroid {
+  background: #f8f6f1;
+  border-radius: 2px;
+}
+
+.subway-map {
+  background: #f2eee4;
+  border-radius: 2px;
+}
+.map-folds {
+  background:
+    linear-gradient(90deg, rgba(60, 48, 32, 0.07), rgba(255, 255, 255, 0.12) 33.2%, rgba(60, 48, 32, 0.14) 33.4%, rgba(255, 255, 255, 0.18) 34%, rgba(60, 48, 32, 0.03) 66.5%, rgba(60, 48, 32, 0.12) 66.7%, rgba(255, 255, 255, 0.15) 67.3%, rgba(60, 48, 32, 0.05)),
+    linear-gradient(180deg, transparent 49.6%, rgba(60, 48, 32, 0.12) 50%, rgba(255, 255, 255, 0.2) 50.6%, transparent 52%);
+  mix-blend-mode: multiply;
+}
+
+.card {
+  border-radius: calc(var(--u) * 0.9);
+  border: 1px solid rgba(27, 25, 21, 0.35);
+}
+.card-face {
+  background: #f8f6f0;
+}
+.card-back {
+  background:
+    radial-gradient(ellipse 34% 22% at 50% 50%, #f8f6f0 96%, transparent 100%),
+    repeating-linear-gradient(45deg, var(--accent) 0 2px, #f3e9e3 2px 5px),
+    #f8f6f0;
+  box-shadow: inset 0 0 0 calc(var(--u) * 0.7) #f8f6f0, inset 0 0 0 calc(var(--u) * 0.8) rgba(168, 53, 44, 0.8);
+}
+
+.watch-band {
+  background:
+    repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 0 3px, rgba(0, 0, 0, 0.05) 3px 6px),
+    #c9c0ae;
+}
+.watch-case {
+  background: linear-gradient(135deg, #5a564e, #2b2924 55%, #1b1915);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+.mug {
+  background: radial-gradient(circle at 38% 34%, #fbf9f4, #ece6da 70%, #d9d1c1);
+  box-shadow: inset 0 0 0 1px rgba(27, 25, 21, 0.25);
+}
+.mug-handle {
+  border-radius: 0 999px 999px 0;
+  border: calc(var(--u) * 1) solid #e9e3d6;
+  border-left: none;
+  box-shadow: 1px 0 0 rgba(27, 25, 21, 0.2);
+}
+
+.pencil-ferrule {
+  background: repeating-linear-gradient(90deg, #b8b1a1 0 2px, #d7d1c3 2px 4px, #9e968a 4px 5px);
+}
+.pencil-body {
+  background-image: repeating-linear-gradient(to bottom, #45403a 0 3px, #2c2924 3px 7px, #3a3630 7px 10px);
+}
+
+.die {
+  border-radius: 18%;
+  background: radial-gradient(circle at 35% 30%, #fffdf8, #ebe5d8);
+  box-shadow: inset 0 0 0 1px rgba(27, 25, 21, 0.3), inset -2px -3px 4px rgba(27, 25, 21, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk *,
+  .desk *::before,
+  .desk *::after {
+    animation: none !important;
+  }
+}

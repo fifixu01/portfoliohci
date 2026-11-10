@@ -14,7 +14,7 @@ export function Catalogue({ number, total, kind, title, lede, mark, onClose, chi
             onClick={onClose}
             className="ink-link-draw inline-flex items-center gap-2 font-serif text-[15px] text-graphite hover:text-ink"
           >
-            <ArrowLeft size={15} strokeWidth={1.5} /> Back to the wall
+            <ArrowLeft size={15} strokeWidth={1.5} /> Back to the desk
           </button>
           <p className="font-display text-[15px] italic text-pencil">
             No. {number} <span className="mx-1 not-italic">/</span> {total}
