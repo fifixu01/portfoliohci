@@ -106,36 +106,39 @@
   --wall: #dccfb6;
 }
 
+/* a moonlit night rather than a dark one: blue sky, violet-blue hills, green fields, so each
+   layer of the landscape still reads as its own colour */
 .train[data-time="night"] {
-  --scene-ink: #d8d0bd;
-  --sky-a: #1e2538;
-  --sky-b: #2c3650;
-  --sky-c: #48526c;
-  --sun: #f4edd2;
-  --cloud: #3a445e;
-  --storm: #2c3348;
-  --hill-1: #2f3850;
-  --hill-2: #283044;
-  --hill-3: #232b3a;
-  --leaf: #2c3a3c;
-  --pine: #263536;
-  --field: #2a3338;
-  --ground: #252c2f;
-  --bush: #1f2a2a;
-  --blade: #161d1f;
-  --wood: #5a4c3c;
-  --roof: #5c3f3c;
-  --wallwash: #4c4f5e;
-  --pane: #f5cd6e;
-  --poppy: #b8463c;
-  --water: #36425c;
-  --bird: #c9c2b0;
-  --lampshade: #3e5852;
-  --chalkboard: #2b3531;
-  --wall: #8f8778;
-  --frame: #b9b1a0;
-  --seat: #5f6a55;
-  --curtain: #b3aa96;
+  --scene-ink: #e2dbc9;
+  --sky-a: #2a3460;
+  --sky-b: #415285;
+  --sky-c: #7385ad;
+  --sun: #f6efd4;
+  --cloud: #5a6a96;
+  --storm: #3e4970;
+  --hill-1: #55609a;
+  --hill-2: #437090;
+  --hill-3: #3f7a78;
+  --leaf: #2d5a4c;
+  --pine: #235048;
+  --field: #4a7a62;
+  --ground: #3d6850;
+  --bush: #2c5a44;
+  --blade: #1e4034;
+  --wood: #86705a;
+  --roof: #a86054;
+  --roofwash: #a86054;
+  --wallwash: #8a92ae;
+  --pane: #f8d377;
+  --poppy: #d2584c;
+  --water: #5c7cae;
+  --bird: #d3ccba;
+  --lampshade: #4f786c;
+  --chalkboard: #2c4038;
+  --wall: #a49e91;
+  --frame: #c8c2b4;
+  --seat: #6e7c64;
+  --curtain: #c2bba9;
   --night: 1;
 }
 
