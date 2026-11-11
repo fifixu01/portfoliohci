@@ -226,19 +226,21 @@ function CoverFace() {
     [160, 48],
     [205, 26.5],
   ];
+  // big round eyes with a highlight, a soft lash line and short brows
   const eye = (cx, flip) => (
-    <g transform={`translate(${cx} 130) scale(${flip ? -1 : 1} 1)`}>
-      <path d="M-12,2 C-6,6 5,5 12,-2" strokeWidth="0.6" />
-      <circle cx="0.5" cy="-0.5" r="3.6" fill="url(#h-dense)" strokeWidth="0.7" />
-      <path d="M-13,1 C-7,-6 5,-7 13,-3 L17,-6" strokeWidth="1.7" />
-      <path d="M-15,-13 C-7,-18 5,-18 16,-12" strokeWidth="1.1" />
+    <g transform={`translate(${cx} 135) scale(${flip ? -1.18 : 1.18} 1.18)`}>
+      <path d="M-11,3 C-5,7 5,6 11,0" strokeWidth="0.5" />
+      <circle cx="0.5" cy="0" r="5" fill="url(#h-dense)" strokeWidth="0.7" />
+      <circle cx="2.2" cy="-1.8" r="1.5" fill="var(--canvas)" stroke="none" />
+      <path d="M-12,2 C-7,-6.5 5,-7.5 12,-2 L15.5,-4.5" strokeWidth="1.5" />
+      <path d="M-10,-14 C-4,-17 4,-17 11,-13.5" strokeWidth="0.9" />
     </g>
   );
   return (
     <svg viewBox="0 0 240 262" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
       <Pencil width={1.1}>
         {/* the whole face sits a little larger, wider and lower than it was drawn */}
-        <g transform="translate(120 147) scale(1.15 1.07) translate(-120 -140)">
+        <g transform="translate(120 147) scale(1.25 1.07) translate(-120 -140)">
         {/* hair falling just past the jaw on both sides */}
         <path d="M67,108 C58,152 62,200 54,240 C70,243 88,236 102,217 C86,197 73,165 67,108 Z" fill="url(#h-cross)" strokeWidth="1" />
         <path d="M173,108 C182,152 178,200 186,240 C170,243 152,236 138,217 C154,197 167,165 173,108 Z" fill="url(#h-cross)" strokeWidth="1" />
@@ -250,9 +252,12 @@ function CoverFace() {
         {/* centre line */}
         <path d="M120,44 V238" strokeWidth="0.5" strokeDasharray="2 3" />
         {/* features */}
-        {eye(99, true)}
-        {eye(141, false)}
-        <path d="M122,136 C121,148 118,157 115,163 C118,167 122,167 125,165" strokeWidth="0.8" />
+        {eye(97, true)}
+        {eye(143, false)}
+        <path d="M116.5,164 C118.5,167 122,167 124,164.5" strokeWidth="0.8" />
+        {/* blush */}
+        <ellipse cx="88" cy="166" rx="9" ry="5" fill="var(--accent)" stroke="none" opacity="0.2" />
+        <ellipse cx="152" cy="166" rx="9" ry="5" fill="var(--accent)" stroke="none" opacity="0.2" />
         <path d="M105,184.5 C111,184 117,183.5 120,185.5 C123,183.5 129,184 135,184.5 C129,191 111,191 105,184.5 Z" fill="url(#h-mid)" strokeWidth="0.8" />
         <path d="M108,187.5 C114,198 126,198 132,187.5 C126,192 114,192 108,187.5 Z" fill="url(#h-sparse)" strokeWidth="0.7" />
         <path d="M102.5,183 q1.2,2 3,2 M137.5,183 q-1.2,2 -3,2" strokeWidth="0.7" />
