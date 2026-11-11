@@ -228,7 +228,14 @@ export const Station = memo(function Station() {
           <br />
           to ride
           <br />
-          <span>⟶</span>
+          <span>
+            <svg viewBox="0 0 64 30" className="aframe-arrow">
+              <g filter="url(#pencil)">
+                <path d="M4,10.5 C14,9 26,10.5 37,9.5 L35.5,2.5 L60,15 L36,27.5 L37,20 C26,21 14,19.5 4,20.5 Z" fill="currentColor" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                <path d="M9,13.5 C16,13 24,13.5 31,13 M12,17 C18,16.6 24,17 29,16.6" fill="none" stroke="var(--chalkboard)" strokeWidth="1.1" strokeLinecap="round" opacity="0.55" />
+              </g>
+            </svg>
+          </span>
         </p>
       </div>
     </>

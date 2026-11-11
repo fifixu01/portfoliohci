@@ -1314,3 +1314,6 @@
 
 /* hand-lettering over the night sky stays light even though the outlines are dark */
 .train[data-time="night"] .rideback { color: #f4ead0; }
+
+/* the chalk arrow on the platform board */
+.aframe-arrow { display: block; width: calc(50 * var(--wu)); height: auto; margin-top: calc(6 * var(--wu)); overflow: visible; }
