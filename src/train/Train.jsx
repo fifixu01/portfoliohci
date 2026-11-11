@@ -160,6 +160,8 @@ export default function Train({ projects, studies }) {
   const live = useRef({ stage: "ride", here: 0, blind: "", pointerAt: 0, bonkAt: 0, snap: 0, opened: null, punched: ["home"] });
 
   const [time, setTime] = useState(initialTime);
+  // phones and tablets: a finger is the main pointer
+  const [touch] = useState(() => window.matchMedia("(pointer: coarse)").matches);
   const [theme, setTheme] = useState(initialTheme);
   const toggleSnow = useCallback(() => setTheme((t) => (t === "snow" ? "classic" : "snow")), []);
   const [here, setHere] = useState(0);
@@ -519,7 +521,7 @@ export default function Train({ projects, studies }) {
                 <Sky time={time} onCycle={() => setTime((t) => TIMES[(TIMES.indexOf(t) + 1) % TIMES.length])} />
                 <Landscape birdRefs={birdRefs}>
                   <Layer depth={1} className="main">
-                    <Station />
+                    <Station touch={touch} />
                     {posters.map((p, i) => (
                       <Billboard key={p.id} project={p} index={i + 1} here={here === i + 1} hidden={flight?.id === p.id} onOpen={open} onFocusStop={rideToStop} />
                     ))}
@@ -544,10 +546,13 @@ export default function Train({ projects, studies }) {
           </div>
           <Ticket punched={punched} fresh={fresh} here={here} onRide={rideToStop} calm={calm} />
           <SnowToggle on={theme === "snow"} onToggle={toggleSnow} />
-          <p className={`hint font-hand ${moved ? "is-gone" : ""}`} aria-hidden="true">
-            scroll, drag, or press → to ride
-          </p>
-          {/* touch screens: ride one stop at a time */}
+          {!touch && (
+            <p className={`hint font-hand ${moved ? "is-gone" : ""}`} aria-hidden="true">
+              scroll, drag, or press → to ride
+            </p>
+          )}
+          {/* touch screens only: ride one stop at a time. Nothing here renders on a computer. */}
+          {touch && (
           <div className="stepper font-hand" role="group" aria-label="Ride">
             <button type="button" className="step step-prev" aria-label="Previous stop" disabled={here === 0} onClick={() => rideToStop(Math.ceil(engine.target / GAP - 0.02) - 1)}>
               <StepArrow />
@@ -562,6 +567,7 @@ export default function Train({ projects, studies }) {
               </button>
             )}
           </div>
+          )}
         </div>
 
         {flight && flightProject && <Flight key={flight.key} project={flightProject} rect={flight.rect} mv={mv} />}

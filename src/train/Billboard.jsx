@@ -169,7 +169,7 @@ const SIGN = (() => {
   return { outer: roughRect(10, 46, 420, 196, r, { over: 5 }), inner: roughRect(20, 56, 400, 176, r, { over: 2 }) };
 })();
 
-export const Station = memo(function Station() {
+export const Station = memo(function Station({ touch }) {
   return (
     <>
       <div className="station" style={{ left: wuCalc(-220), top: wuCalc(GROUND - 400), width: wuCalc(440), height: wuCalc(400) }}>
@@ -224,16 +224,9 @@ export const Station = memo(function Station() {
           </g>
         </svg>
         <p>
-          <span className="only-fine">
-            scroll
-            <br />
-            to ride
-          </span>
-          <span className="only-touch">
-            all
-            <br />
-            aboard!
-          </span>
+          {touch ? "all" : "scroll"}
+          <br />
+          {touch ? "aboard!" : "to ride"}
           <br />
           <span>
             <svg viewBox="0 0 64 30" className="aframe-arrow">

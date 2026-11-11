@@ -1315,10 +1315,16 @@
 
 /* ---------- touch screens: step from stop to stop ---------- */
 
-.aframe p span.only-fine,
-.aframe p span.only-touch { animation: none; }
-.only-touch { display: none; }
-.stepper { display: none; }
+.stepper {
+  position: absolute;
+  left: 50%;
+  bottom: 2.4vh;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 5;
+}
 .step {
   display: inline-flex;
   align-items: center;
@@ -1345,22 +1351,6 @@
 .step-arrow { display: block; width: 26px; height: auto; overflow: visible; color: var(--accent); }
 .step-next .step-arrow { animation: nudge 1.2s ease-in-out infinite; }
 
-@media (pointer: coarse), (max-width: 720px) {
-  .hint { display: none; }
-  .only-fine { display: none; }
-  .only-touch { display: inline; }
-  .stepper {
-    position: absolute;
-    left: 50%;
-    bottom: 2.4vh;
-    translate: -50% 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 5;
-  }
-}
 @media (max-width: 720px) {
   .stepper { bottom: auto; top: calc(100% - var(--win-b) + 3vh); }
-  .snow-toggle { top: calc(100% - var(--win-b) + 3.2vh); }
 }
