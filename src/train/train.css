@@ -770,7 +770,7 @@
   left: 21%;
   top: 65%;
   width: 58%;
-  padding: calc(7 * var(--wu)) calc(10 * var(--wu)) calc(8 * var(--wu));
+  padding: calc(9.5 * var(--wu)) calc(10 * var(--wu)) calc(5.5 * var(--wu));
   background: var(--signpaper);
   border: max(1px, calc(1.4 * var(--wu))) solid #1b1915;
   border-radius: 2px;
