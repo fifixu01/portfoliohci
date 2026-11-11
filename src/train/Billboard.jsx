@@ -207,7 +207,7 @@ export const Station = memo(function Station() {
             <i />
             <span>Human-Centered Computing</span>
           </p>
-          <p className="station-sub font-serif">Northeastern University. I like figuring out what a product should do, then making it feel good to use.</p>
+          <p className="station-sub font-serif">Northeastern University</p>
           <p className="station-focus">Product · UI/UX · HCI · Frontend · Data Viz</p>
         </div>
         {/* a hand-written note hanging under the sign */}
