@@ -7,8 +7,11 @@ import { TrainContext, useTrain } from "./context.js";
 import { Engine } from "./engine.js";
 import { Landscape, Layer, SceneDefs, Sky } from "./Scenery.jsx";
 import { Ticket } from "./Ticket.jsx";
+import { Atmosphere, MoodPicker, Rainbow } from "./Atmosphere.jsx";
+import { initialTheme, saveTheme } from "./themes.js";
 import { BIRDS, clamp, GAP, MAX, nearestStop, stopIndex, stopX, STOPS, timeFromHour, TIMES, VIEW_H } from "./world.js";
 import "./train.css";
+import "./themes.css";
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const TUBE = 40; // thickness of the rolled-up poster, px
@@ -53,6 +56,7 @@ function Rain() {
           <path key={x} d={PUFF} transform={`translate(${x} ${-34 + (i % 2) * 22}) scale(3.4 2.6)`} className="storm" strokeWidth="0.45" />
         ))}
       </svg>
+      <Rainbow />
       <motion.div className="rain-drops" style={{ skewX }}>
         {DROPS.map((d, i) => (
           <span key={i} style={{ left: `${d.left}%`, top: `${d.top}%`, height: d.len, animationDelay: `${d.d}s` }} />
@@ -157,6 +161,11 @@ export default function Train({ projects, studies }) {
   const live = useRef({ stage: "ride", here: 0, blind: "", pointerAt: 0, bonkAt: 0, snap: 0, opened: null, punched: ["home"] });
 
   const [time, setTime] = useState(initialTime);
+  const [theme, setTheme] = useState(initialTheme);
+  const pickTheme = useCallback((id) => {
+    setTheme(id);
+    saveTheme(id);
+  }, []);
   const [here, setHere] = useState(0);
   const [blind, setBlind] = useState("Now boarding · Fiora Xu Station");
   const [punched, setPunched] = useState(loadPunched);
@@ -498,7 +507,7 @@ export default function Train({ projects, studies }) {
 
   return (
     <TrainContext.Provider value={ctx}>
-      <main ref={rootRef} className="train" data-time={time} style={{ "--wu": `${dims.wu}px` }} onPointerMove={onLook} onPointerOver={onOver}>
+      <main ref={rootRef} className="train" data-time={time} data-theme={theme} style={{ "--wu": `${dims.wu}px` }} onPointerMove={onLook} onPointerOver={onOver}>
         <SketchDefs />
         <div className="cabin" inert={!riding}>
           <div className="wall" aria-hidden="true" />
@@ -528,6 +537,7 @@ export default function Train({ projects, studies }) {
             </motion.div>
             <Steam />
             <Rain />
+            <Atmosphere theme={theme} />
             <Glass />
             {party > 0 && !calm && <Confetti key={`party-${party}`} />}
             {toots > 0 && <Toot key={`toot-${toots}`} />}
@@ -540,6 +550,7 @@ export default function Train({ projects, studies }) {
             <Cat look={look} alert={alert} happy={party > 0 && here === STOPS.length - 1} />
           </div>
           <Ticket punched={punched} fresh={fresh} here={here} onRide={rideToStop} calm={calm} />
+          <MoodPicker theme={theme} onPick={pickTheme} />
           <p className={`hint font-hand ${moved ? "is-gone" : ""}`} aria-hidden="true">
             <span className="hint-desk">scroll, drag, or press → to ride</span>
             <span className="hint-touch">drag the view to ride →</span>
