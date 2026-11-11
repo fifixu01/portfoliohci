@@ -1196,11 +1196,6 @@
 }
 .train[data-time="night"] .hint { color: #f4ead0; }
 .hint.is-gone { opacity: 0; transform: translateY(8px); }
-.hint-touch { display: none; }
-@media (pointer: coarse) {
-  .hint-desk { display: none; }
-  .hint-touch { display: inline; }
-}
 @keyframes hint { 50% { translate: calc(-50% + 7px) 0; } }
 
 /* ---------- poster in flight, and the page ---------- */
@@ -1317,3 +1312,55 @@
 
 /* the chalk arrow on the platform board */
 .aframe-arrow { display: block; width: calc(50 * var(--wu)); height: auto; margin-top: calc(-17 * var(--wu)); overflow: visible; }
+
+/* ---------- touch screens: step from stop to stop ---------- */
+
+.aframe p span.only-fine,
+.aframe p span.only-touch { animation: none; }
+.only-touch { display: none; }
+.stepper { display: none; }
+.step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 18px;
+  border: 1.5px solid #1b1915;
+  border-radius: 999px;
+  background: rgba(250, 248, 242, 0.95);
+  box-shadow: 0 3px 0 rgba(27, 25, 21, 0.85), 0 10px 14px -8px rgba(30, 26, 20, 0.5);
+  color: #1b1915;
+  font-size: 22px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.3s;
+}
+.step:active { transform: translateY(3px); box-shadow: 0 0 0 rgba(27, 25, 21, 0.85); }
+.step:disabled { opacity: 0.35; pointer-events: none; }
+.step:focus-visible { outline: 2px dashed var(--accent); outline-offset: 4px; }
+.step-prev { width: 44px; padding: 0; }
+.step-prev .step-arrow { transform: scaleX(-1); }
+.step-arrow { display: block; width: 26px; height: auto; overflow: visible; color: var(--accent); }
+.step-next .step-arrow { animation: nudge 1.2s ease-in-out infinite; }
+
+@media (pointer: coarse), (max-width: 720px) {
+  .hint { display: none; }
+  .only-fine { display: none; }
+  .only-touch { display: inline; }
+  .stepper {
+    position: absolute;
+    left: 50%;
+    bottom: 2.4vh;
+    translate: -50% 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 5;
+  }
+}
+@media (max-width: 720px) {
+  .stepper { bottom: auto; top: calc(100% - var(--win-b) + 3vh); }
+  .snow-toggle { top: calc(100% - var(--win-b) + 3.2vh); }
+}

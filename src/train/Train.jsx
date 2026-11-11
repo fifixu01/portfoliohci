@@ -57,6 +57,14 @@ function Rain() {
   );
 }
 
+function StepArrow() {
+  return (
+    <svg viewBox="0 0 64 30" className="step-arrow" aria-hidden="true">
+      <path d="M4,10.5 C14,9 26,10.5 37,9.5 L35.5,2.5 L60,15 L36,27.5 L37,20 C26,21 14,19.5 4,20.5 Z" fill="currentColor" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" filter="url(#pencil)" />
+    </svg>
+  );
+}
+
 function Steam() {
   return (
     <div className="steam" aria-hidden="true">
@@ -335,6 +343,9 @@ export default function Train({ projects, studies }) {
 
   const onPointerDown = (e) => {
     if (live.current.stage !== "ride" || (e.pointerType === "mouse" && e.button !== 0)) return;
+    // fingers do not drag the view: on a phone that fights the browser's own scrolling, so
+    // touch screens ride stop to stop with the buttons under the window instead
+    if (e.pointerType === "touch") return;
     drag.current = { on: true, moved: false, x: e.clientX, vx: 0, t: e.timeStamp, id: e.pointerId };
   };
   const onPointerMove = (e) => {
@@ -534,9 +545,23 @@ export default function Train({ projects, studies }) {
           <Ticket punched={punched} fresh={fresh} here={here} onRide={rideToStop} calm={calm} />
           <SnowToggle on={theme === "snow"} onToggle={toggleSnow} />
           <p className={`hint font-hand ${moved ? "is-gone" : ""}`} aria-hidden="true">
-            <span className="hint-desk">scroll, drag, or press → to ride</span>
-            <span className="hint-touch">drag the view to ride →</span>
+            scroll, drag, or press → to ride
           </p>
+          {/* touch screens: ride one stop at a time */}
+          <div className="stepper font-hand" role="group" aria-label="Ride">
+            <button type="button" className="step step-prev" aria-label="Previous stop" disabled={here === 0} onClick={() => rideToStop(Math.ceil(engine.target / GAP - 0.02) - 1)}>
+              <StepArrow />
+            </button>
+            {here === STOPS.length - 1 ? (
+              <button type="button" className="step step-next" onClick={() => rideToStop(0)}>
+                back to the start ↺
+              </button>
+            ) : (
+              <button type="button" className="step step-next" onClick={() => rideToStop(Math.floor(engine.target / GAP + 0.02) + 1)}>
+                next stop <StepArrow />
+              </button>
+            )}
+          </div>
         </div>
 
         {flight && flightProject && <Flight key={flight.key} project={flightProject} rect={flight.rect} mv={mv} />}

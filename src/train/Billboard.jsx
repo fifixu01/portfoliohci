@@ -224,9 +224,16 @@ export const Station = memo(function Station() {
           </g>
         </svg>
         <p>
-          scroll
-          <br />
-          to ride
+          <span className="only-fine">
+            scroll
+            <br />
+            to ride
+          </span>
+          <span className="only-touch">
+            all
+            <br />
+            aboard!
+          </span>
           <br />
           <span>
             <svg viewBox="0 0 64 30" className="aframe-arrow">
