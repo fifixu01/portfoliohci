@@ -237,6 +237,8 @@ function CoverFace() {
   return (
     <svg viewBox="0 0 240 262" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
       <Pencil width={1.1}>
+        {/* the whole face sits a little larger, wider and lower than it was drawn */}
+        <g transform="translate(120 147) scale(1.15 1.07) translate(-120 -140)">
         {/* hair falling just past the jaw on both sides */}
         <path d="M67,108 C58,152 62,200 54,240 C70,243 88,236 102,217 C86,197 73,165 67,108 Z" fill="url(#h-cross)" strokeWidth="1" />
         <path d="M173,108 C182,152 178,200 186,240 C170,243 152,236 138,217 C154,197 167,165 173,108 Z" fill="url(#h-cross)" strokeWidth="1" />
@@ -264,6 +266,7 @@ function CoverFace() {
         {outline.map(([x, y], i) => (
           <circle key={i} cx={x} cy={y} r="1.6" fill="var(--ink)" stroke="none" />
         ))}
+        </g>
         {/* plate caption */}
         <text x="16" y="24" fontSize="7.5" letterSpacing="1.6" fill="var(--ink)" stroke="none" fontFamily="Newsreader, serif">
           FIG. 1 — 478 POINTS
