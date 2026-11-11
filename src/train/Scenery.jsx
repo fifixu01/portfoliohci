@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
 import { motion, useTransform } from "framer-motion";
-import { rng } from "../rough.js";
+import { f, rng } from "../rough.js";
 import { useTrain } from "./context.js";
 import { blob, ridge, ridgePts, smooth } from "./draw.js";
 import { at, BIRDS, GAP } from "./world.js";
@@ -411,6 +411,47 @@ function Windmill({ x, y }) {
   );
 }
 
+// Block letters on the far hillside, like the Hollywood sign: FIFI over 4EVER, each letter on
+// its own posts and none of them quite level.
+const GLYPH = {
+  F: { w: 11, d: "M0,18 V0 H11 M0,8.5 H8" },
+  I: { w: 0, d: "M0,18 V0" },
+  4: { w: 13, d: "M9.5,18 V0 L0,12.5 H13" },
+  E: { w: 11, d: "M11,0 H0 V18 H11 M0,8.5 H8" },
+  V: { w: 13, d: "M0,0 L6.5,18 L13,0" },
+  R: { w: 12, d: "M0,18 V0 H7.5 Q12,0 12,4.5 Q12,9 7.5,9 H0 M6,9 L12,18" },
+};
+const HILL_SIGN = (() => {
+  const r = rng(444);
+  const line = (word, y) => {
+    const gap = 7.5;
+    const width = [...word].reduce((n, c) => n + GLYPH[c].w, 0) + gap * (word.length - 1);
+    let x = 52 - width / 2;
+    return [...word].map((c) => {
+      const g = { ...GLYPH[c], x, y: y + (r() - 0.5) * 2.6, rot: (r() - 0.5) * 5 };
+      x += g.w + gap;
+      return g;
+    });
+  };
+  return [...line("FIFI", 4), ...line("4EVER", 31)];
+})();
+
+function HillSign({ x, y }) {
+  return (
+    <Prop x={x} y={y} w={104} h={56} className="hill-sign" style={{ width: wuCalc(99), height: wuCalc(53.3), left: wuCalc(x - 49.5) }}>
+      <g filter="url(#pencil)" fill="none" strokeLinejoin="miter">
+        {HILL_SIGN.map((g, i) => (
+          <g key={i} transform={`translate(${f(g.x)} ${f(g.y)}) rotate(${f(g.rot)} ${g.w / 2} 18)`}>
+            <path d={`M${g.w * 0.2},18 v5 M${g.w * 0.8},18 v5`} stroke="var(--ink)" strokeWidth="0.7" opacity="0.7" />
+            <path d={g.d} stroke="var(--ink)" strokeWidth="5.4" strokeLinecap="square" />
+            <path d={g.d} className="hill-sign-face" strokeWidth="3.6" strokeLinecap="square" />
+          </g>
+        ))}
+      </g>
+    </Prop>
+  );
+}
+
 function Balloon({ x, y }) {
   return (
     <Prop x={x} y={y} w={70} h={104} className="bob">
@@ -644,6 +685,7 @@ export function Landscape({ birdRefs, children }) {
       <FarHills />
       <Layer depth={0.1}>
         <Windmill x={at(1, 0.1, 400)} y={farB(at(1, 0.1, 400) % FAR_W) - 140} />
+        <HillSign x={-314} y={352} />
       </Layer>
       <MidFields />
       <Layer depth={0.28}>

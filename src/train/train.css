@@ -1305,3 +1305,6 @@
 
 /* the sketchbook mood keeps the paper grain light, so it reads as paper rather than a yellow wash */
 .train[data-theme="classic"] .paper-grain { opacity: 0.55; }
+
+/* the white letters on the far hill */
+.hill-sign-face { stroke: #fbfaf6; opacity: calc(1 - var(--night) * 0.3); }
