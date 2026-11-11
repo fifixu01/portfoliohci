@@ -235,14 +235,11 @@ function CoverFace() {
     </g>
   );
   return (
-    <svg viewBox="0 0 240 300" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 240 262" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
       <Pencil width={1.1}>
-        {/* long hair falling behind the shoulders */}
-        <path d="M67,108 C57,165 67,220 48,274 C68,265 86,260 100,257 C104,246 106,236 106,222 C88,200 74,166 67,108 Z" fill="url(#h-cross)" strokeWidth="1" />
-        <path d="M173,108 C183,165 173,220 192,274 C172,265 154,260 140,257 C136,246 134,236 134,222 C152,200 166,166 173,108 Z" fill="url(#h-cross)" strokeWidth="1" />
-        {/* a slender neck + shoulders */}
-        <path d="M108,218 C108,238 106,250 100,258 C76,264 52,274 38,292 H202 C188,274 164,264 140,258 C134,250 132,238 132,218" fill="var(--canvas)" />
-        <path d="M132,228 C133,242 136,252 140,258 C160,262 178,268 194,280 C174,273 154,268 134,264 C130,254 130,240 132,228 Z" fill="url(#h-sparse)" stroke="none" />
+        {/* hair falling just past the jaw on both sides */}
+        <path d="M67,108 C58,152 62,200 54,240 C70,243 88,236 102,217 C86,197 73,165 67,108 Z" fill="url(#h-cross)" strokeWidth="1" />
+        <path d="M173,108 C182,152 178,200 186,240 C170,243 152,236 138,217 C154,197 167,165 173,108 Z" fill="url(#h-cross)" strokeWidth="1" />
         {/* head, lightly shaded on the right */}
         <path d={head} fill="var(--canvas)" strokeWidth="1.3" />
         <path d="M158,86 C166,98 170,112 170,124 C170,160 156,196 138,216 C150,194 160,166 160,130 C160,112 160,98 158,86 Z" fill="url(#h-sparse)" stroke="none" />
