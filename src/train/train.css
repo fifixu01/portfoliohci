@@ -26,15 +26,15 @@
   --punch: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34'><g fill='%23f4f1ea' stroke='%231b1915' stroke-width='1.6' stroke-linejoin='round'><path d='M4,3 C9,1 14,6 17,13 L31,22 C33,24 31,28 28,26 L13,18 C7,15 3,9 4,3 Z'/><path d='M3,4 C1,9 6,14 13,17 L22,31 C24,33 28,31 26,28 L18,13 C15,7 9,3 3,4 Z'/></g><circle cx='15' cy='15' r='1.8' fill='%231b1915'/></svg>") 4 4, pointer;
 
   /* cabin */
-  --wall: #ddd4c1;
-  --frame: #efe9da;
+  --wall: #dddad1;
+  --frame: #f1eee7;
   --seat: #8f9a7b;
   --seat-deep: #6f7a5e;
-  --curtain: #e9dfc8;
+  --curtain: #e8e4d9;
   --leather: #b08a62;
-  --strapring: #efe9da;
+  --strapring: #f1eee7;
   --steel: #c9c6bd;
-  --ticket: #f5ecd2;
+  --ticket: #f3eee1;
   --hole: #4a4034;
   --fur: #f6f1e6;
   --fur-patch: #d99a5b;
@@ -43,29 +43,29 @@
   /* outside: day */
   --scene-ink: #2b2620;
   --sky-a: #bcd3d6;
-  --sky-b: #dde6dc;
-  --sky-c: #f3eedd;
+  --sky-b: #dae6e4;
+  --sky-c: #eef0eb;
   --sun: #f3c766;
-  --cloud: #fbf8f0;
+  --cloud: #fbfaf7;
   --storm: #9ba6ab;
   --hill-1: #c3d0cb;
   --hill-2: #afc2b2;
   --hill-3: #a3b78f;
   --leaf: #8fa878;
   --pine: #7c9779;
-  --field: #c3c088;
-  --ground: #b3ad79;
+  --field: #b8c299;
+  --ground: #a8b489;
   --bush: #879c68;
   --blade: #6f8456;
-  --wood: #c9b189;
+  --wood: #c3b299;
   --roof: #c9806b;
   --roofwash: #c9806b;
-  --wallwash: #f4eedf;
+  --wallwash: #f4f2ea;
   --pane: #5a554d;
   --poppy: #c8473c;
   --water: #b9d3d6;
   --bird: #5b5750;
-  --signpaper: #f6f2e8;
+  --signpaper: #f7f6f1;
   --chalkboard: #3b4a43;
   --lampshade: #5e7f76;
   --lampglow: #ffe9a8;
@@ -1235,3 +1235,6 @@
   }
   .steam { display: none; }
 }
+
+/* the sketchbook mood keeps the paper grain light, so it reads as paper rather than a yellow wash */
+.train[data-theme="classic"] .paper-grain { opacity: 0.55; }

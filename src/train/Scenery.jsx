@@ -240,7 +240,7 @@ const Field = memo(function Field() {
 const GROUND_Y = 530;
 const GROUND_BITS = (() => {
   const r = rng(101);
-  return Array.from({ length: 46 }, () => ({ x: r() * GAP, y: GROUND_Y + 6 + r() * 60, s: 0.8 + r() * 0.9, poppy: r() > 0.72 }));
+  return Array.from({ length: 30 }, () => ({ x: r() * GAP, y: GROUND_Y + 6 + r() * 60, s: 0.8 + r() * 0.9, poppy: r() > 0.8 }));
 })();
 const GROUND_LINE = smooth(ridgePts((x) => GROUND_Y + Math.sin((x / GAP) * Math.PI * 4) * 2.5, GAP, 60));
 
@@ -298,7 +298,7 @@ const Poles = memo(function Poles() {
 const BLADES = (() => {
   const r = rng(909);
   const out = [];
-  for (let x = 0; x < 1300; x += 13 + r() * 30) {
+  for (let x = 0; x < 1300; x += 22 + r() * 42) {
     const h = 26 + r() * 54;
     const lean = (r() - 0.5) * 34;
     out.push(`M${x},604 Q${x + lean * 0.2},${600 - h * 0.6} ${x + lean},${600 - h} Q${x + lean * 0.5 + 5},${600 - h * 0.5} ${x + 8},604 Z`);
@@ -323,9 +323,7 @@ const Foreground = memo(function Foreground() {
 const CLOUD = "M14,44 C2,44 0,30 12,27 C10,14 28,8 36,18 C42,4 66,4 70,20 C82,14 96,24 90,34 C100,36 98,46 88,45 Z";
 const CLOUDS = [
   { x: -520, y: 60, s: 1.5, d: 0 },
-  { x: -120, y: 128, s: 0.9, d: -22 },
   { x: 260, y: 46, s: 1.2, d: -40 },
-  { x: 640, y: 150, s: 0.75, d: -9 },
   { x: 980, y: 80, s: 1.35, d: -31 },
   { x: 1380, y: 120, s: 1, d: -15 },
 ];
@@ -358,7 +356,6 @@ export const Sky = memo(function Sky({ time, onCycle }) {
           {time === "night" ? (
             <g filter="url(#pencil)">
               <path d="M78,22 A40,40 0 1 0 100,84 A32,32 0 0 1 78,22 Z" fill="var(--sun)" stroke="var(--ink)" strokeWidth="1.4" />
-              <path d="M52,58 q4,3 8,0 M46,46 h.1 M64,44 h.1" {...ink} strokeWidth="2" />
             </g>
           ) : (
             <>
@@ -369,8 +366,6 @@ export const Sky = memo(function Sky({ time, onCycle }) {
               </g>
               <g filter="url(#pencil)">
                 <circle cx="60" cy="60" r="30" fill="var(--sun)" stroke="var(--ink)" strokeWidth="1.4" />
-                <path d="M48,66 q12,10 24,0 M50,54 h.1 M70,54 h.1" {...ink} strokeWidth="2.2" />
-                <path d="M42,62 h5 M73,62 h5" stroke="var(--poppy)" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
               </g>
             </>
           )}
@@ -645,7 +640,6 @@ export function Landscape({ birdRefs, children }) {
     <>
       <Layer depth={0.06}>
         <Balloon x={at(2.5, 0.06, 120)} y={90} />
-        <Balloon x={at(0.6, 0.06, -260)} y={150} />
       </Layer>
       <FarHills />
       <Layer depth={0.1}>
@@ -661,7 +655,6 @@ export function Landscape({ birdRefs, children }) {
         <TentAndBunting x={at(3, 0.55, 400)} y={372} />
         <ClockTower x={at(4, 0.55, -370)} y={292} />
         <Sheep x={at(3.5, 0.55, -60)} y={476} />
-        <Sheep x={at(3.5, 0.55, 20)} y={484} flip />
         <Sheep x={at(3.5, 0.55, 150)} y={474} />
         <Sheep x={at(1.5, 0.55, 90)} y={480} flip />
       </Layer>
