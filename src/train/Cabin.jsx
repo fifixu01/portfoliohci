@@ -76,11 +76,11 @@ export const Curtain = memo(function Curtain() {
           {/* the tie: a band right across the gathered curtain, finished with a bow */}
           <path d="M-1,189 H38 V203 H-1 Z" fill="var(--accent)" stroke="var(--ink)" strokeWidth="1.1" />
           <g fill="var(--accent)" stroke="var(--ink)" strokeWidth="1" strokeLinejoin="round">
-            <path d="M20,199 L12,217 L17.5,214 L21,201 Z M23,199 L31,217 L25.5,214 L22,201 Z" />
-            <path d="M21.5,196 C12,182 3,185 4.5,196 C3,207 12,210 21.5,196 Z M21.5,196 C31,182 40,185 38.5,196 C40,207 31,210 21.5,196 Z" />
-            <rect x="18.3" y="191.8" width="6.4" height="8.4" rx="1.8" />
+            <path d="M19.5,199 C16,213 11,226 5,240 L12.5,237 L16.5,243 C19,228 21,213 22,201 Z M23.5,199 C27,213 32,226 38,240 L30.5,237 L26.5,243 C24,228 22.5,213 21.5,201 Z" />
+            <path d="M21.5,194 C13,178 -7,184 -6,201 C-5,215 10,213 21.5,199 Z M21.5,194 C30,178 50,184 49,201 C48,215 33,213 21.5,199 Z" />
+            <rect x="17.5" y="190.5" width="8" height="11" rx="2.2" />
           </g>
-          <path d="M9,193 q3,3 0,6 M34,193 q-3,3 0,6" {...ink} strokeWidth="0.7" opacity="0.6" />
+          <path d="M17,195 C10,193 3,196 0,203 M26,195 C33,193 40,196 43,203" {...ink} strokeWidth="0.7" opacity="0.6" />
         </g>
       </svg>
     </motion.div>
