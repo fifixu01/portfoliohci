@@ -1,7 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="9 2 66 66">
-  <!-- a quick doodle of the cat from the train window: one wobbly outline, dot eyes, a little mouth -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="3 -3.5 78 78">
+  <!-- a quick doodle of the cat from the train window: one wobbly outline, dot eyes, a little mouth, whiskers -->
   <path d="M19,32 C17,24 15,15 15,7 C21,11 27,16 32,21 C39,18 46,18 53,21 C58,16 64,11 70,8 C69,16 67,24 65,31 C72,44 67,63 42,64 C17,63 12,45 19,32 Z" fill="#f8f4ea" stroke="#1b1915" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
   <path d="M19.5,29 C18.5,23 17.5,17 17.5,11 C22,14.5 26,18 29.5,21.5 C25,23.5 21.5,26 19.5,29 Z" fill="#d99a5b"/>
+  <path d="M23,46 L6,43 M23,51.5 L7,55 M61,47 L78,44 M61,52.5 L77,56" fill="none" stroke="#1b1915" stroke-width="2.6" stroke-linecap="round"/>
   <circle cx="31" cy="40" r="3.2" fill="#1b1915"/>
   <circle cx="53" cy="41" r="3.2" fill="#1b1915"/>
   <path d="M36,49 C38,53 41,53 42.5,49.5 C44,53 47,53 49,49" fill="none" stroke="#1b1915" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
