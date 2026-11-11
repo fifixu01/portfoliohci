@@ -1,6 +1,5 @@
 import { memo } from "react";
 import { rng } from "../rough.js";
-import { THEMES } from "./themes.js";
 
 // What drifts past the glass in each mood: snowflakes, sparkles and shooting stars, butterflies
 // by day and fireflies by night. All of it is CSS animation, so it costs nothing while riding.
@@ -98,29 +97,17 @@ export function Rainbow() {
   );
 }
 
-// The mood picker: four paint dabs on the cabin wall.
-export function MoodPicker({ theme, onPick }) {
-  const current = THEMES.find((t) => t.id === theme) || THEMES[0];
+// A snowflake button in the corner of the cabin: the one way to change the weather.
+export function SnowToggle({ on, onToggle }) {
   return (
-    <div className="moods" role="group" aria-label="Mood">
-      <span className="moods-label font-hand" aria-hidden="true">
-        mood:
-      </span>
-      {THEMES.map((t) => (
-        <button
-          key={t.id}
-          type="button"
-          className={`mood ${t.id === theme ? "is-on" : ""}`}
-          style={{ "--dab-a": t.dab[0], "--dab-b": t.dab[1] }}
-          aria-pressed={t.id === theme}
-          aria-label={t.label}
-          title={t.label}
-          onClick={() => onPick(t.id)}
-        />
-      ))}
-      <span key={current.id} className="moods-name font-hand" aria-hidden="true">
-        {current.label}
-      </span>
-    </div>
+    <button type="button" className={`snow-toggle ${on ? "is-on" : ""}`} aria-pressed={on} aria-label="Let it snow" title={on ? "stop the snow" : "let it snow"} onClick={onToggle}>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <g fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          {[0, 60, 120].map((a) => (
+            <path key={a} d="M12,2.5 V21.5 M9.4,4.6 L12,7 L14.6,4.6 M9.4,19.4 L12,17 L14.6,19.4" transform={`rotate(${a} 12 12)`} />
+          ))}
+        </g>
+      </svg>
+    </button>
   );
 }

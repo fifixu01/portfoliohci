@@ -7,8 +7,8 @@ import { TrainContext, useTrain } from "./context.js";
 import { Engine } from "./engine.js";
 import { Landscape, Layer, SceneDefs, Sky } from "./Scenery.jsx";
 import { Ticket } from "./Ticket.jsx";
-import { Atmosphere, MoodPicker, Rainbow } from "./Atmosphere.jsx";
-import { initialTheme, saveTheme } from "./themes.js";
+import { Atmosphere, Rainbow, SnowToggle } from "./Atmosphere.jsx";
+import { initialTheme } from "./themes.js";
 import { BIRDS, clamp, GAP, MAX, nearestStop, stopIndex, stopX, STOPS, timeFromHour, TIMES, VIEW_H } from "./world.js";
 import "./train.css";
 import "./themes.css";
@@ -162,10 +162,7 @@ export default function Train({ projects, studies }) {
 
   const [time, setTime] = useState(initialTime);
   const [theme, setTheme] = useState(initialTheme);
-  const pickTheme = useCallback((id) => {
-    setTheme(id);
-    saveTheme(id);
-  }, []);
+  const toggleSnow = useCallback(() => setTheme((t) => (t === "snow" ? "classic" : "snow")), []);
   const [here, setHere] = useState(0);
   const [blind, setBlind] = useState("Now boarding · Fiora Xu Station");
   const [punched, setPunched] = useState(loadPunched);
@@ -550,7 +547,7 @@ export default function Train({ projects, studies }) {
             <Cat look={look} alert={alert} happy={party > 0 && here === STOPS.length - 1} />
           </div>
           <Ticket punched={punched} fresh={fresh} here={here} onRide={rideToStop} calm={calm} />
-          <MoodPicker theme={theme} onPick={pickTheme} />
+          <SnowToggle on={theme === "snow"} onToggle={toggleSnow} />
           <p className={`hint font-hand ${moved ? "is-gone" : ""}`} aria-hidden="true">
             <span className="hint-desk">scroll, drag, or press → to ride</span>
             <span className="hint-touch">drag the view to ride →</span>
