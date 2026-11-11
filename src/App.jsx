@@ -10,9 +10,9 @@ const DeskHome = lazy(() => import("./desk/DeskHome.jsx"));
 // The order here is the order of the stops along the line.
 const projects = [
   { id: "face", title: "Face Analyzer", meta: "Computer vision · Web app", frame: "ornate", depth: 1 },
-  { id: "viz", title: "MBTA Data Visualization", meta: "Interactive storytelling", frame: "matted", depth: 0.45 },
-  { id: "web", title: "GameNite", meta: "Full-stack project", frame: "classic", depth: 0.7 },
   { id: "nb", title: "Notability on Your Wrist", meta: "Hackathon · 4th place", frame: "thin", depth: 0.3 },
+  { id: "web", title: "GameNite", meta: "Full-stack project", frame: "classic", depth: 0.7 },
+  { id: "viz", title: "MBTA Data Visualization", meta: "Interactive storytelling", frame: "matted", depth: 0.45 },
 ];
 
 const STUDIES = { face: FaceStudy, viz: VizStudy, web: WebStudy, nb: NbStudy };

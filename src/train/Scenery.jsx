@@ -700,9 +700,9 @@ export function Landscape({ birdRefs, children }) {
       </Layer>
       <Field />
       <Layer depth={0.55}>
-        <Boston x={at(2, 0.55, 40)} y={346} />
+        <Boston x={at(4, 0.55, 40)} y={346} />
         <TentAndBunting x={at(3, 0.55, 400)} y={372} />
-        <ClockTower x={at(4, 0.55, -370)} y={292} />
+        <ClockTower x={at(2, 0.55, -370)} y={292} />
         <Sheep x={at(3.5, 0.55, -60)} y={476} />
         <Sheep x={at(3.5, 0.55, 150)} y={474} />
         <Sheep x={at(1.5, 0.55, 90)} y={480} flip />
@@ -711,7 +711,7 @@ export function Landscape({ birdRefs, children }) {
       <Layer depth={1}>
         <Crossing x={GAP * 0.5} y={GROUND_Y - 142} />
         <Scarecrow x={GAP * 1 - 430} y={GROUND_Y - 138} />
-        <TSign x={GAP * 2 + 330} y={GROUND_Y - 142} />
+        <TSign x={GAP * 4 + 330} y={GROUND_Y - 142} />
       </Layer>
       {children}
       <Poles />

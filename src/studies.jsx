@@ -166,7 +166,7 @@ export function VizStudy({ onClose }) {
   const url = "https://fifixu01.github.io/ds4200FinalProject/";
   return (
     <Catalogue
-      number="02"
+      number="04"
       total="04"
       kind="Data visualization · DS4200"
       title="MBTA Data Visualization"
@@ -276,7 +276,7 @@ export function NbStudy({ onClose }) {
   const [expanded, setExpanded] = useState(null);
   return (
     <Catalogue
-      number="04"
+      number="02"
       total="04"
       kind="Internal hackathon · Notability onsite 2026"
       mark="★ 4th place overall"
