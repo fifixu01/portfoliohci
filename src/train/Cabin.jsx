@@ -77,10 +77,10 @@ export const Curtain = memo(function Curtain() {
           <path d="M-1,189 H38 V203 H-1 Z" fill="var(--accent)" stroke="var(--ink)" strokeWidth="1.1" />
           <g fill="var(--accent)" stroke="var(--ink)" strokeWidth="1" strokeLinejoin="round">
             <path d="M19,200 C17.5,216 15,234 9,252 L16,249 L19.5,256 C21.5,238 22,218 22,202 Z M24,200 C26,214 30,230 36,246 L29,244 L26,251 C23.5,234 22,216 21.5,202 Z" />
-            {/* soft loops that hang below the knot rather than standing out sideways */}
+            {/* ribbon loops: each folds to a crisp point at its outer end and hangs below the knot */}
             <path
               fillRule="evenodd"
-              d="M20,193.5 C11,190 -5,195 -10,210 C-13,227 3,232 12,219 C16,213 19,205 21,200 Z M10.5,205 C6.5,203.5 0.5,206 -0.5,212 C-0.5,217.5 5,218 8.5,213 C10,210.5 10.5,208 10.5,205 Z M23,193.5 C32,190.5 47,195 53,211 C56,229 40,234 31,220 C27,214 24,205.5 22,200 Z M32.5,205.5 C36.5,204 42.5,206.5 43.5,213 C43.5,218.5 38,219 34.5,214 C33,211.5 32.5,208.5 32.5,205.5 Z"
+              d="M20,193.5 C9,191 -4,198 -12.5,214 C-5,226.5 8,222 21,200.5 Z M11,203 C6,204.5 1.5,208.5 -2.5,214 C3,215.5 8,210.5 11,203 Z M23,193.5 C34,191.5 47,199 55.5,216.5 C47.5,229 35,224 22,200.5 Z M32,203.5 C37,205 41.5,209.5 45.5,216 C40,217.5 35,211.5 32,203.5 Z"
             />
             <rect x="17.3" y="190" width="8.4" height="12" rx="2.3" />
           </g>
