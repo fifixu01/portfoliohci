@@ -109,7 +109,7 @@
 /* a moonlit night rather than a dark one: blue sky, violet-blue hills, green fields, so each
    layer of the landscape still reads as its own colour */
 .train[data-time="night"] {
-  --scene-ink: #e2dbc9;
+  --scene-ink: #14172a;
   --sky-a: #2a3460;
   --sky-b: #415285;
   --sky-c: #7385ad;
@@ -1311,3 +1311,6 @@
 
 /* the white letters on the far hill */
 .hill-sign-face { stroke: #fbfaf6; opacity: calc(1 - var(--night) * 0.3); }
+
+/* hand-lettering over the night sky stays light even though the outlines are dark */
+.train[data-time="night"] .rideback { color: #f4ead0; }
