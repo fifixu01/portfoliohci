@@ -31,16 +31,6 @@ function initialTime() {
   return TIMES.includes(q) ? q : timeFromHour(new Date().getHours());
 }
 
-function loadPunched() {
-  try {
-    const saved = JSON.parse(window.sessionStorage.getItem("fiora-line-ticket") || "null");
-    if (Array.isArray(saved)) return saved;
-  } catch {
-    /* private mode: start with a fresh ticket */
-  }
-  return ["home"];
-}
-
 // ---------- little set pieces ----------
 
 const PUFF = "M14,44 C2,44 0,30 12,27 C10,14 28,8 36,18 C42,4 66,4 70,20 C82,14 96,24 90,34 C100,36 98,46 88,45 Z";
@@ -166,7 +156,8 @@ export default function Train({ projects, studies }) {
   const toggleSnow = useCallback(() => setTheme((t) => (t === "snow" ? "classic" : "snow")), []);
   const [here, setHere] = useState(0);
   const [blind, setBlind] = useState("Now boarding · Fiora Xu Station");
-  const [punched, setPunched] = useState(loadPunched);
+  // every visit starts with a fresh ticket: only the home stop is punched
+  const [punched, setPunched] = useState(["home"]);
   useEffect(() => {
     live.current.punched = punched;
   }, [punched]);
@@ -208,14 +199,6 @@ export default function Train({ projects, studies }) {
     ro.observe(el);
     return () => ro.disconnect();
   }, [wu, viewU]);
-
-  useEffect(() => {
-    try {
-      window.sessionStorage.setItem("fiora-line-ticket", JSON.stringify(punched));
-    } catch {
-      /* ignore */
-    }
-  }, [punched]);
 
   // Punch a stop on the ticket. Returns true the first time.
   const punch = useCallback((id) => {
