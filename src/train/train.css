@@ -1310,7 +1310,7 @@
 .train[data-theme="classic"] .paper-grain { opacity: 0.55; }
 
 /* the white letters on the far hill */
-.hill-sign-face { stroke: #fbfaf6; opacity: calc(1 - var(--night) * 0.3); }
+.hill-sign-face { stroke: #fbfaf6; opacity: calc(1 - var(--night) * 0.12); }
 
 /* hand-lettering over the night sky stays light even though the outlines are dark */
 .train[data-time="night"] .rideback { color: #f4ead0; }
