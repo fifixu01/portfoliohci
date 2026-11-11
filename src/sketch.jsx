@@ -201,57 +201,71 @@ export function Plaque({ title, meta, className = "" }) {
 
 // A face plate with its outline sampled into points and measured at four heights.
 function CoverFace() {
-  const head = "M120,46 C162,46 184,82 184,128 C184,170 166,206 142,226 C134,233 127,236 120,236 C113,236 106,233 98,226 C74,206 56,170 56,128 C56,82 78,46 120,46 Z";
+  // a slim oval with a soft chin; the right half as cubic segments so the mesh points can sit exactly on it
+  const half = [
+    [[120, 52], [152, 52], [170, 84], [170, 124]],
+    [[170, 124], [170, 160], [156, 196], [138, 216]],
+    [[138, 216], [131, 224], [125, 228], [120, 228]],
+  ];
+  const head =
+    "M120,52 C152,52 170,84 170,124 C170,160 156,196 138,216 C131,224 125,228 120,228 C115,228 109,224 102,216 C84,196 70,160 70,124 C70,84 88,52 120,52 Z";
+  const at = ([a, b, c, d], t) => {
+    const u = 1 - t;
+    return [0, 1].map((k) => u * u * u * a[k] + 3 * u * u * t * b[k] + 3 * u * t * t * c[k] + t * t * t * d[k]);
+  };
   // points along the outline, like the face mesh contour
-  const outline = Array.from({ length: 30 }, (_, i) => {
-    const t = (i / 30) * Math.PI * 2;
-    const y = 141 - Math.cos(t) * 95;
-    const taper = y > 150 ? 1 - ((y - 150) / 86) ** 1.6 * 0.72 : 1;
-    return [120 + Math.sin(t) * 64 * taper, y];
-  });
+  const right = [
+    ...[0.2, 0.4, 0.6, 0.8, 1].map((t) => at(half[0], t)),
+    ...[0.2, 0.4, 0.6, 0.8, 1].map((t) => at(half[1], t)),
+    at(half[2], 0.55),
+  ];
+  const outline = [[120, 52], ...right, [120, 228], ...right.map(([x, y]) => [240 - x, y])];
+  // widths measured clear of the eyes: forehead, cheekbones, jaw
   const widths = [
-    [84, 50],
-    [128, 64],
-    [190, 44],
-    [214, 27],
+    [98, 46.5],
+    [160, 48],
+    [205, 26.5],
   ];
   const eye = (cx, flip) => (
-    <g transform={`translate(${cx} 124) scale(${flip ? -1 : 1} 1)`}>
-      <path d="M-14,1 C-8,-7 6,-8 13,-2 C6,5 -6,6 -14,1 Z" fill="var(--canvas)" strokeWidth="1" />
-      <circle cx="0" cy="-1" r="4.2" fill="url(#h-dense)" strokeWidth="0.8" />
-      <path d="M-16,-12 C-8,-19 6,-19 15,-13" strokeWidth="2.2" />
+    <g transform={`translate(${cx} 130) scale(${flip ? -1 : 1} 1)`}>
+      <path d="M-12,2 C-6,6 5,5 12,-2" strokeWidth="0.6" />
+      <circle cx="0.5" cy="-0.5" r="3.6" fill="url(#h-dense)" strokeWidth="0.7" />
+      <path d="M-13,1 C-7,-6 5,-7 13,-3 L17,-6" strokeWidth="1.7" />
+      <path d="M-15,-13 C-7,-18 5,-18 16,-12" strokeWidth="1.1" />
     </g>
   );
   return (
     <svg viewBox="0 0 240 300" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
       <Pencil width={1.1}>
-        {/* neck + shoulders */}
-        <path d="M100,226 L98,256 C70,262 44,272 30,292 H210 C196,272 170,262 142,256 L140,226" fill="var(--canvas)" />
-        <path d="M140,236 L142,256 C162,260 180,266 196,278 C176,272 156,266 134,262 Z" fill="url(#h-mid)" stroke="none" />
-        {/* head, shaded on the right */}
+        {/* long hair falling behind the shoulders */}
+        <path d="M67,108 C57,165 67,220 48,274 C68,265 86,260 100,257 C104,246 106,236 106,222 C88,200 74,166 67,108 Z" fill="url(#h-cross)" strokeWidth="1" />
+        <path d="M173,108 C183,165 173,220 192,274 C172,265 154,260 140,257 C136,246 134,236 134,222 C152,200 166,166 173,108 Z" fill="url(#h-cross)" strokeWidth="1" />
+        {/* a slender neck + shoulders */}
+        <path d="M108,218 C108,238 106,250 100,258 C76,264 52,274 38,292 H202 C188,274 164,264 140,258 C134,250 132,238 132,218" fill="var(--canvas)" />
+        <path d="M132,228 C133,242 136,252 140,258 C160,262 178,268 194,280 C174,273 154,268 134,264 C130,254 130,240 132,228 Z" fill="url(#h-sparse)" stroke="none" />
+        {/* head, lightly shaded on the right */}
         <path d={head} fill="var(--canvas)" strokeWidth="1.3" />
-        <path d="M150,58 C176,74 184,104 184,128 C184,170 166,206 142,226 C156,200 168,170 168,130 C168,98 162,74 150,58 Z" fill="url(#h-sparse)" stroke="none" />
-        {/* hair */}
-        <path d="M58,118 C52,70 84,34 124,36 C164,38 190,70 182,118 C176,86 160,66 128,64 C100,64 80,80 70,104 C66,96 62,102 58,118 Z" fill="url(#h-cross)" strokeWidth="1" />
+        <path d="M158,86 C166,98 170,112 170,124 C170,160 156,196 138,216 C150,194 160,166 160,130 C160,112 160,98 158,86 Z" fill="url(#h-sparse)" stroke="none" />
+        {/* hair parted to one side, swept across the forehead */}
+        <path d="M68,128 C62,84 84,45 122,43 C160,45 180,84 172,128 C169,104 160,82 142,68 C128,84 100,96 77,98 C72,108 69,118 68,128 Z" fill="url(#h-cross)" strokeWidth="1" />
         {/* centre line */}
-        <path d="M120,40 V242" strokeWidth="0.6" strokeDasharray="2 3" />
+        <path d="M120,44 V238" strokeWidth="0.5" strokeDasharray="2 3" />
         {/* features */}
-        {eye(96, false)}
-        {eye(144, true)}
-        <path d="M117,128 C116,146 112,160 108,168 C112,174 128,174 132,168 C128,160 124,146 123,128" strokeWidth="0.9" />
-        <path d="M110,168 C114,166 116,170 120,170 C124,170 126,166 130,168" strokeWidth="0.9" />
-        <path d="M100,192 C108,186 116,186 120,189 C124,186 132,186 140,192 C130,196 110,196 100,192 Z" fill="url(#h-mid)" strokeWidth="1" />
-        <path d="M102,201 C112,207 128,207 138,201 C130,198 110,198 102,201 Z" fill="url(#h-sparse)" strokeWidth="0.8" />
+        {eye(99, true)}
+        {eye(141, false)}
+        <path d="M122,136 C121,148 118,157 115,163 C118,167 122,167 125,165" strokeWidth="0.8" />
+        <path d="M108,187 C113,183 117,183 120,185 C123,183 127,183 132,187 C126,189 114,189 108,187 Z" fill="url(#h-mid)" strokeWidth="0.8" />
+        <path d="M109,188.5 C115,196 125,196 131,188.5 C124,190 116,190 109,188.5 Z" fill="url(#h-sparse)" strokeWidth="0.7" />
         {/* width measurements with end ticks */}
-        {widths.map(([y, half]) => (
-          <g key={y} strokeWidth="0.75">
-            <path d={`M${120 - half},${y} H${120 + half}`} strokeDasharray="5 2.5" />
-            <path d={`M${120 - half},${y - 4} V${y + 4} M${120 + half},${y - 4} V${y + 4}`} />
+        {widths.map(([y, w]) => (
+          <g key={y} strokeWidth="0.6">
+            <path d={`M${120 - w},${y} H${120 + w}`} strokeDasharray="5 2.5" />
+            <path d={`M${120 - w},${y - 3.5} V${y + 3.5} M${120 + w},${y - 3.5} V${y + 3.5}`} />
           </g>
         ))}
         {/* sampled outline points */}
         {outline.map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="1.9" fill="var(--ink)" stroke="none" />
+          <circle key={i} cx={x} cy={y} r="1.6" fill="var(--ink)" stroke="none" />
         ))}
         {/* plate caption */}
         <text x="16" y="24" fontSize="7.5" letterSpacing="1.6" fill="var(--ink)" stroke="none" fontFamily="Newsreader, serif">
