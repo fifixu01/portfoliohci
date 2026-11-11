@@ -16,8 +16,9 @@ import "./themes.css";
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const TUBE = 40; // thickness of the rolled-up poster, px
 
-const CALLOUT = { face: "hop off here!", viz: "next stop: the T", web: "hop off, it’s game night", nb: "hop off, check your wrist", about: "hop off & say hi" };
-const ABOUT = { id: "about", kind: "about", title: "Say hello", meta: "About · Contact", stopLine: "End of the line", callout: CALLOUT.about };
+const CALLOUT = { face: "hop off here!", viz: "next stop: the T", web: "hop off, it’s game night", nb: "hop off, check your wrist" };
+// The last board only carries contact details. It is not a project and does not open.
+const CONTACT = { id: "about", kind: "contact", title: "Say hello", stopLine: "End of the line" };
 
 const posterEl = (id) => document.querySelector(`.train [data-stop="${id}"] .poster`);
 const measurePoster = (id) => {
@@ -186,7 +187,7 @@ export default function Train({ projects, studies }) {
   const posters = useMemo(
     () => [
       ...projects.map((p, i) => ({ ...p, kind: "project", stopLine: `Stop ${String(i + 1).padStart(2, "0")} of ${String(projects.length).padStart(2, "0")}`, callout: CALLOUT[p.id] || "hop off here!" })),
-      ABOUT,
+      CONTACT,
     ],
     [projects],
   );
@@ -388,6 +389,7 @@ export default function Train({ projects, studies }) {
       const L = live.current;
       if (L.stage !== "ride" || drag.current.moved) return;
       const i = stopIndex(id);
+      if (STOPS[i].kind !== "project") return;
       setStage("opening");
       clearTimeout(L.snap);
       L.opened = id;

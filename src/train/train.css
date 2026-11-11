@@ -725,8 +725,8 @@
 }
 .station-kicker { color: var(--accent); }
 .station-name {
-  margin: calc(2 * var(--wu)) 0 calc(6 * var(--wu));
-  font-size: calc(78 * var(--wu));
+  margin: calc(1 * var(--wu)) 0 calc(5 * var(--wu));
+  font-size: calc(64 * var(--wu));
   font-weight: 300;
   line-height: 0.95;
 }
@@ -745,13 +745,80 @@
   background: var(--accent);
 }
 .station-sub {
-  margin-top: calc(8 * var(--wu));
-  max-width: 86%;
-  font-size: calc(15.5 * var(--wu));
+  margin-top: calc(7 * var(--wu));
+  max-width: 98%;
+  font-size: calc(14 * var(--wu));
   font-style: italic;
-  line-height: 1.25;
+  line-height: 1.22;
   color: #4a4640;
 }
+.station-focus {
+  margin-top: calc(7 * var(--wu));
+  font-family: "Newsreader", serif;
+  font-size: calc(9.6 * var(--wu));
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #4a4640;
+}
+/* a note on two strings under the sign */
+.station-note {
+  position: absolute;
+  left: 21%;
+  top: 65%;
+  width: 58%;
+  padding: calc(7 * var(--wu)) calc(10 * var(--wu)) calc(8 * var(--wu));
+  background: var(--signpaper);
+  border: max(1px, calc(1.4 * var(--wu))) solid #1b1915;
+  border-radius: 2px;
+  box-shadow: 0 calc(3 * var(--wu)) calc(4 * var(--wu)) rgba(30, 26, 20, 0.25);
+  font-size: calc(17.5 * var(--wu));
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  color: #1b1915;
+  transform-origin: 50% calc(-18 * var(--wu));
+  animation: note-sway 6.5s ease-in-out infinite;
+}
+.station-note::before,
+.station-note::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  width: max(1px, calc(1.2 * var(--wu)));
+  height: calc(18 * var(--wu));
+  background: #1b1915;
+}
+.station-note::before { left: 12%; }
+.station-note::after { right: 12%; }
+@keyframes note-sway {
+  0%, 100% { transform: rotate(-1.4deg); }
+  50% { transform: rotate(1.1deg); }
+}
+
+/* the contact board at the end: pasted up for good, with links instead of a page behind it */
+.poster-static { cursor: default; }
+.poster-static:hover,
+.bb.is-here .poster-static,
+.bb.is-here .poster-static:hover { transform: none; --curl: 0px; }
+.poster-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(5 * var(--wu));
+  font-family: "Newsreader", serif;
+  font-size: max(11.5px, calc(15.5 * var(--wu)));
+  line-height: 1.2;
+}
+.poster-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  cursor: pointer;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
+}
+.poster-links a:hover { color: var(--accent); }
+.poster-links a:focus-visible { outline: 2px dashed var(--accent); outline-offset: 3px; }
 .aframe p {
   position: absolute;
   inset: 12% 14% 8%;

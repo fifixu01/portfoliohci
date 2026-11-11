@@ -34,12 +34,42 @@ function CoverHello() {
 export function PosterFace({ project }) {
   return (
     <div className={`poster-face poster-${project.id}`}>
-      <div className="poster-art">{project.id === "about" ? <CoverHello /> : <Cover project={project} />}</div>
+      <div className="poster-art">
+        <Cover project={project} />
+      </div>
       <div className="poster-copy">
         <p className="poster-no">{project.stopLine}</p>
         <p className="poster-title font-display">{project.title}</p>
         <p className="poster-rule" />
         <p className="poster-meta">{project.meta}</p>
+      </div>
+    </div>
+  );
+}
+
+const EMAIL = "msfiora@gmail.com";
+const LINKEDIN = "https://www.linkedin.com/in/fiora-xu-17b00223a";
+
+// The last board is not a project: it just carries the contact details, so it stays pasted up.
+function ContactFace({ project, onFocus }) {
+  const stop = (e) => e.stopPropagation();
+  return (
+    <div className="poster-face poster-about">
+      <div className="poster-art">
+        <CoverHello />
+      </div>
+      <div className="poster-copy">
+        <p className="poster-no">{project.stopLine}</p>
+        <p className="poster-title font-display">{project.title}</p>
+        <p className="poster-rule" />
+        <p className="poster-links">
+          <a href={`mailto:${EMAIL}`} onPointerDown={stop} onFocus={onFocus}>
+            {EMAIL}
+          </a>
+          <a href={LINKEDIN} target="_blank" rel="noreferrer" onPointerDown={stop} onFocus={onFocus}>
+            LinkedIn <ArrowUpRight size="0.9em" strokeWidth={1.6} />
+          </a>
+        </p>
       </div>
     </div>
   );
@@ -59,6 +89,7 @@ const BOARD = (() => {
 const LAMPS = [95, 190, 285];
 
 export const Billboard = memo(function Billboard({ project, index, here, hidden, onOpen, onFocusStop, children }) {
+  const contact = project.kind === "contact";
   return (
     <div
       className={`bb ${here ? "is-here" : ""}`}
@@ -96,28 +127,36 @@ export const Billboard = memo(function Billboard({ project, index, here, hidden,
         ))}
       </svg>
 
-      <button
-        type="button"
-        className="poster"
-        aria-label={project.kind === "about" ? "Open About and contact" : `Open ${project.title}: ${project.meta}`}
-        style={hidden ? { visibility: "hidden" } : undefined}
-        onClick={() => onOpen(project.id)}
-        onFocus={(e) => e.currentTarget.matches(":focus-visible") && onFocusStop(index)}
-      >
-        <PosterFace project={project} />
-        <span className="poster-curl" aria-hidden="true" />
-      </button>
+      {contact ? (
+        <div className="poster poster-static">
+          <ContactFace project={project} onFocus={(e) => e.currentTarget.matches(":focus-visible") && onFocusStop(index)} />
+        </div>
+      ) : (
+        <button
+          type="button"
+          className="poster"
+          aria-label={`Open ${project.title}: ${project.meta}`}
+          style={hidden ? { visibility: "hidden" } : undefined}
+          onClick={() => onOpen(project.id)}
+          onFocus={(e) => e.currentTarget.matches(":focus-visible") && onFocusStop(index)}
+        >
+          <PosterFace project={project} />
+          <span className="poster-curl" aria-hidden="true" />
+        </button>
+      )}
       {/* tape that stays on the board */}
       {["tl", "tr", "bl", "br"].map((c) => (
         <span key={c} className={`bb-tape bb-tape-${c}`} aria-hidden="true" />
       ))}
 
-      <div className="bb-callout font-hand" aria-hidden="true">
-        <svg viewBox="0 0 40 46">
-          <path d="M30,44 C34,30 26,18 12,10 M12,10 l11,0 M12,10 l3,10" {...ink} strokeWidth="2" pathLength="1" />
-        </svg>
-        <span>{project.callout}</span>
-      </div>
+      {!contact && (
+        <div className="bb-callout font-hand" aria-hidden="true">
+          <svg viewBox="0 0 40 46">
+            <path d="M30,44 C34,30 26,18 12,10 M12,10 l11,0 M12,10 l3,10" {...ink} strokeWidth="2" pathLength="1" />
+          </svg>
+          <span>{project.callout}</span>
+        </div>
+      )}
       {children}
     </div>
   );
@@ -168,8 +207,13 @@ export const Station = memo(function Station() {
             <i />
             <span>Human-Centered Computing</span>
           </p>
-          <p className="station-sub font-serif">Northeastern University. I care about how products work, and how they feel to use.</p>
+          <p className="station-sub font-serif">Northeastern University. I work where design meets functionality: how products work, and how they feel to use.</p>
+          <p className="station-focus">Product · UI/UX · HCI · Frontend · Data Viz</p>
         </div>
+        {/* a hand-written note hanging under the sign */}
+        <p className="station-note font-hand">
+          currently looking for PM, UI/UX, product design &amp; QA / automation roles :)
+        </p>
       </div>
       {/* chalk board on the platform */}
       <div className="aframe font-hand" style={{ left: wuCalc(300), top: wuCalc(GROUND - 150), width: wuCalc(130), height: wuCalc(156) }} aria-hidden="true">
@@ -191,21 +235,13 @@ export const Station = memo(function Station() {
   );
 });
 
-// ---------- last stop: buffers, lantern, and a shingle with the contact links ----------
+// ---------- last stop: buffers and a lantern (the contact details are on the billboard) ----------
 
 export const Terminus = memo(function Terminus({ index, onRideBack }) {
   const x = index * GAP;
   const stop = (e) => e.stopPropagation();
   return (
     <>
-      <div className="shingle" style={{ left: wuCalc(x - 124), top: wuCalc(GROUND - 76), width: wuCalc(248) }}>
-        <a href="mailto:msfiora@gmail.com" onPointerDown={stop}>
-          msfiora@gmail.com
-        </a>
-        <a href="https://www.linkedin.com/in/fiora-xu-17b00223a" target="_blank" rel="noreferrer" onPointerDown={stop}>
-          LinkedIn <ArrowUpRight size="0.9em" strokeWidth={1.6} />
-        </a>
-      </div>
       <svg className="prop buffer" viewBox="0 0 200 190" aria-hidden="true" style={{ left: wuCalc(x + 240), top: wuCalc(GROUND - 172), width: wuCalc(200), height: wuCalc(190) }}>
         <g filter="url(#pencil)" strokeLinejoin="round">
           <path d="M30,180 L64,96 H150 V180 M64,96 L150,180 M30,180 H170" {...ink} strokeWidth="3" />

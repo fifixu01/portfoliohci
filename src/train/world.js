@@ -12,7 +12,7 @@ export const STOPS = [
   { id: "viz", kind: "project", label: "MBTA", name: "MBTA Data Visualization", punch: "star" },
   { id: "web", kind: "project", label: "Games", name: "GameNite", punch: "diamond" },
   { id: "nb", kind: "project", label: "Watch", name: "Notability on Your Wrist", punch: "clover" },
-  { id: "about", kind: "terminus", label: "Hello", name: "About and contact", punch: "circle" },
+  { id: "about", kind: "terminus", label: "Hello", name: "Say hello", punch: "circle" },
 ];
 
 export const stopX = (i) => i * GAP;

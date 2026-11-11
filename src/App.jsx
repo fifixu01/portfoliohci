@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import Train from "./train/Train.jsx";
-import { AboutStudy } from "./train/about.jsx";
 import { FaceStudy, NbStudy, VizStudy, WebStudy } from "./studies.jsx";
 
 // The homepage is a train ride (src/train). The old desk homepage is kept, unused, in
@@ -16,7 +15,7 @@ const projects = [
   { id: "nb", title: "Notability on Your Wrist", meta: "Hackathon · 4th place", frame: "thin", depth: 0.3 },
 ];
 
-const STUDIES = { face: FaceStudy, viz: VizStudy, web: WebStudy, nb: NbStudy, about: AboutStudy };
+const STUDIES = { face: FaceStudy, viz: VizStudy, web: WebStudy, nb: NbStudy };
 
 const showDesk = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("desk");
 
