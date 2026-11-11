@@ -457,8 +457,14 @@ function Balloon({ x, y }) {
     <Prop x={x} y={y} w={70} h={104} className="bob">
       <g filter="url(#pencil)">
         <path d="M35,4 C58,4 66,24 62,42 C59,56 46,66 42,74 H28 C24,66 11,56 8,42 C4,24 12,4 35,4 Z" fill="var(--cloud)" stroke="var(--ink)" strokeWidth="1.2" />
-        <path d="M35,4 C46,14 48,54 42,74 H35 Z" fill="var(--poppy)" opacity="0.85" />
-        <path d="M35,4 C24,14 22,54 28,74 H21 C10,50 8,20 35,4 Z" fill="var(--sun)" opacity="0.8" />
+        {/* the stripes are clipped to the envelope so no colour spills past its outline */}
+        <clipPath id="balloon-envelope">
+          <path d="M35,4 C58,4 66,24 62,42 C59,56 46,66 42,74 H28 C24,66 11,56 8,42 C4,24 12,4 35,4 Z" />
+        </clipPath>
+        <g clipPath="url(#balloon-envelope)">
+          <path d="M35,4 C46,14 48,54 42,74 H35 Z" fill="var(--poppy)" opacity="0.85" />
+          <path d="M35,4 C24,14 22,54 28,74 C20,62 12,52 14,34 C15,20 24,10 35,4 Z" fill="var(--sun)" opacity="0.8" />
+        </g>
         <path d="M35,4 C58,4 66,24 62,42 C59,56 46,66 42,74 H28 C24,66 11,56 8,42 C4,24 12,4 35,4 Z M35,4 V74" {...ink} strokeWidth="1.1" />
         <path d="M29,74 L31,88 M41,74 L39,88" {...ink} strokeWidth="0.7" />
         <rect x="29" y="88" width="12" height="10" rx="1.5" fill="var(--wood)" stroke="var(--ink)" strokeWidth="1" />
