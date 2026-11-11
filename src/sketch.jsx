@@ -253,8 +253,9 @@ function CoverFace() {
         {eye(99, true)}
         {eye(141, false)}
         <path d="M122,136 C121,148 118,157 115,163 C118,167 122,167 125,165" strokeWidth="0.8" />
-        <path d="M108,187 C113,183 117,183 120,185 C123,183 127,183 132,187 C126,189 114,189 108,187 Z" fill="url(#h-mid)" strokeWidth="0.8" />
-        <path d="M109,188.5 C115,196 125,196 131,188.5 C124,190 116,190 109,188.5 Z" fill="url(#h-sparse)" strokeWidth="0.7" />
+        <path d="M105,184.5 C111,184 117,183.5 120,185.5 C123,183.5 129,184 135,184.5 C129,191 111,191 105,184.5 Z" fill="url(#h-mid)" strokeWidth="0.8" />
+        <path d="M108,187.5 C114,198 126,198 132,187.5 C126,192 114,192 108,187.5 Z" fill="url(#h-sparse)" strokeWidth="0.7" />
+        <path d="M102.5,183 q1.2,2 3,2 M137.5,183 q-1.2,2 -3,2" strokeWidth="0.7" />
         {/* width measurements with end ticks */}
         {widths.map(([y, w]) => (
           <g key={y} strokeWidth="0.6">
