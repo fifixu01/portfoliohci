@@ -16,7 +16,7 @@ import "./themes.css";
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const TUBE = 40; // thickness of the rolled-up poster, px
 
-const CALLOUT = { face: "hop off here!", viz: "next stop: the T", web: "hop off, it’s game night", nb: "hop off, check your wrist" };
+const CALLOUT = { day: "hop off, catch the sunset", face: "hop off here!", viz: "next stop: the T", web: "hop off, it’s game night", nb: "hop off, check your wrist" };
 // The last board only carries contact details. It is not a project and does not open.
 const CONTACT = { id: "about", kind: "contact", title: "Say hello", stopLine: "End of the line" };
 
@@ -118,6 +118,9 @@ function Flight({ project, rect, mv }) {
   const y = useTransform(peel, (p) => p * -7);
   const clipPath = useTransform(roll, (r) => `inset(-20% -20% ${r * 100}% -20%)`);
   const shadow = useTransform(peel, (p) => p);
+  // once it's fully rolled up the sheet is gone: without this, its top edge and shadow stay behind as a
+  // faint slanted line across the open page
+  const posterOpacity = useTransform(roll, (r) => (r > 0.995 ? 0 : 1));
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const tx = useTransform(fly, (f) => rect.left * (1 - f));
@@ -132,7 +135,7 @@ function Flight({ project, rect, mv }) {
   const tubeOpacity = useTransform(roll, (r) => Math.min(1, r * 10));
   return (
     <div className="flight" aria-hidden="true">
-      <motion.div className="flight-poster" style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height, scale, rotate, y, clipPath }}>
+      <motion.div className="flight-poster" style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height, scale, rotate, y, clipPath, opacity: posterOpacity }}>
         <motion.div className="flight-shadow" style={{ opacity: shadow }} />
         <PosterFace project={project} />
       </motion.div>

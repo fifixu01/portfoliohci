@@ -411,7 +411,68 @@ function CoverWatch() {
   );
 }
 
+// One day as a tall strip of paper: night at the top, the sun at noon, dusk at the bottom,
+// with a note and a taped photo pinned where they happened and the "now" line across it.
+function CoverDay() {
+  const rays = Array.from({ length: 12 }, (_, i) => {
+    const a = (i * Math.PI) / 6;
+    const r0 = 21,
+      r1 = i % 2 ? 28 : 33;
+    return `M${(142 + Math.cos(a) * r0).toFixed(1)},${(118 + Math.sin(a) * r0).toFixed(1)} L${(142 + Math.cos(a) * r1).toFixed(1)},${(118 + Math.sin(a) * r1).toFixed(1)}`;
+  }).join(" ");
+  return (
+    <svg viewBox="0 0 240 300" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
+      <Pencil width={1.15}>
+        {/* the strip */}
+        <rect x="56" y="12" width="128" height="276" rx="5" fill="var(--canvas)" strokeWidth="1.4" />
+        {/* night at the top, thinning into morning */}
+        <path d="M56,17 Q56,12 61,12 H179 Q184,12 184,17 V58 H56 Z" fill="url(#h-dense)" stroke="none" />
+        <rect x="56" y="58" width="128" height="16" fill="url(#h-mid)" stroke="none" />
+        <rect x="56" y="74" width="128" height="14" fill="url(#h-sparse)" stroke="none" />
+        {/* crescent moon and stars */}
+        <path d="M92,24 A13,13 0 1 0 104,44 A10,10 0 1 1 92,24 Z" fill="var(--canvas)" strokeWidth="0.9" />
+        {[
+          [124, 26, 1.6],
+          [150, 40, 1.3],
+          [168, 22, 1.5],
+          [136, 48, 1.1],
+          [72, 50, 1.2],
+        ].map(([cx, cy, r]) => (
+          <circle key={`${cx}${cy}`} cx={cx} cy={cy} r={r} fill="var(--canvas)" stroke="none" />
+        ))}
+        {/* hour ticks down the side */}
+        {Array.from({ length: 11 }, (_, i) => (
+          <path key={i} d={`M62,${34 + i * 24} h${i % 3 === 0 ? 9 : 5}`} strokeWidth="0.7" stroke={i < 2 ? "var(--canvas)" : "var(--ink)"} />
+        ))}
+        {/* the sun at noon */}
+        <circle cx="142" cy="118" r="15" fill="var(--canvas)" strokeWidth="1.3" />
+        <path d="M133,126 A15,15 0 0 0 156,112 A20,20 0 0 1 133,126 Z" fill="url(#h-mid)" stroke="none" />
+        <path d={rays} strokeWidth="1" />
+        {/* a note */}
+        <rect x="80" y="158" width="72" height="30" fill="var(--canvas)" strokeWidth="1" />
+        <path d="M86,167 H110 M86,174 H144 M86,180 H130" strokeWidth="0.7" />
+        {/* the now line, running off both edges */}
+        <path d="M40,202 H200" strokeWidth="1.5" />
+        <rect x="34" y="196" width="26" height="12" rx="6" fill="var(--ink)" strokeWidth="1" />
+        {/* a taped photo */}
+        <g transform="rotate(-5 132 238)">
+          <rect x="108" y="212" width="48" height="56" fill="var(--canvas)" strokeWidth="1.1" />
+          <rect x="113" y="217" width="38" height="36" fill="url(#h-sparse)" strokeWidth="0.7" />
+          <path d="M113,244 L124,234 L132,241 L140,231 L151,243 V253 H113 Z" fill="url(#h-dense)" stroke="none" />
+          <circle cx="142" cy="225" r="3" fill="var(--canvas)" strokeWidth="0.7" />
+          <path d="M124,208 h18 l1,8 h-20 Z" fill="var(--canvas)" strokeWidth="0.7" />
+        </g>
+        {/* dusk at the bottom */}
+        <path d="M56,270 H184 V283 Q184,288 179,288 H61 Q56,288 56,283 Z" fill="url(#h-mid)" stroke="none" />
+        <path d="M56,279 H184 V283 Q184,288 179,288 H61 Q56,288 56,283 Z" fill="url(#h-dense)" stroke="none" />
+        <rect x="56" y="12" width="128" height="276" rx="5" strokeWidth="1.4" />
+      </Pencil>
+    </svg>
+  );
+}
+
 const DRAWINGS = {
+  day: CoverDay,
   face: CoverFace,
   viz: CoverTransit,
   web: CoverKnight,

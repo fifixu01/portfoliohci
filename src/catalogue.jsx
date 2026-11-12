@@ -158,8 +158,10 @@ export function Stat({ value, label }) {
   );
 }
 
-export function Figure({ n, src, alt, caption, onExpand, aspect = "aspect-[4/3]", fit = "object-cover", variant = "thin", seed = 7, className = "" }) {
-  const inner = <img src={src} alt={alt} className={`h-full w-full bg-white ${fit}`} />;
+// `natural` lets the picture set its own height, so the whole image shows inside the frame with nothing cropped.
+export function Figure({ n, src, alt, caption, onExpand, aspect = "aspect-[4/3]", fit = "object-cover", variant = "thin", seed = 7, className = "", natural = false }) {
+  if (natural) aspect = "";
+  const inner = <img src={src} alt={alt} className={natural ? "block h-auto w-full bg-white" : `h-full w-full bg-white ${fit}`} />;
   return (
     <figure className={className}>
       {onExpand ? (

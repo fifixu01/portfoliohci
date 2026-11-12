@@ -32,13 +32,284 @@ const nbScreens = [
   },
 ];
 
+const dayDesk = [
+  {
+    src: asset("scroll-desk-morning.jpg"),
+    alt: "The top of a day on a computer",
+    caption: "Morning. Each day opens on its header: the place, sunrise and sunset, the sky, and tonight’s moon. (The entries in these screenshots are a sample day.)",
+  },
+  {
+    src: asset("scroll-desk-midday.jpg"),
+    alt: "Midday on a computer",
+    caption: "Midday. Three lanes: calendar events on the left, writing in the middle, photos on the right.",
+  },
+  {
+    src: asset("scroll-desk-sunset.jpg"),
+    alt: "Sunset on a computer",
+    caption: "Sunset. Today’s page opens on the now line, with a card waiting for whatever is happening.",
+  },
+  {
+    src: asset("scroll-desk-night.jpg"),
+    alt: "Night on a computer",
+    caption: "Night. The same page a few hours later: stars, the moon in its real phase, and cooler paper.",
+  },
+];
+
+const dayPhone = [
+  {
+    src: asset("scroll-phone-morning.jpg"),
+    alt: "The top of a day on a phone",
+    caption: "The day’s header, stacked for a narrow screen",
+  },
+  {
+    src: asset("scroll-phone-sunset.jpg"),
+    alt: "Sunset on a phone",
+    caption: "One column: notes and photos in time order, nothing overlapping",
+  },
+  {
+    src: asset("scroll-phone-month.jpg"),
+    alt: "The month on a phone",
+    caption: "The month as a wall calendar you flip by swiping up or down",
+  },
+];
+
+export function DayStudy({ onClose }) {
+  const [expanded, setExpanded] = useState(null);
+  const url = "https://scroll-through-a-day.vercel.app";
+  return (
+    <Catalogue
+      number="01"
+      total="05"
+      kind="Personal project · Full-stack web app"
+      title="Scroll Through a Day"
+      lede="A full-stack journal where scroll position is time. Your notes, your photos, and your Google Calendar all sit where they happened."
+      onClose={onClose}
+    >
+      <Section n="Overview" title="The project">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-[1fr_27rem]">
+          <div>
+            <Prose>
+              <p>
+                Scroll Through a Day turns each day into <strong>one tall page</strong>. Dawn arrives as you scroll down, the sky goes blue, then gold, then dark, and the notes and photos you added sit at the moment they happened. Today’s page opens on a glowing <strong>“now” line</strong> with one question: what’s happening right now?
+              </p>
+              <p>
+                It is built for daily use. Sign in with Google and your <strong>Google Calendar</strong> lines up beside the hours it covers, so the day already has its shape before you write a word, and your entries <strong>sync across your computer and phone</strong>.
+              </p>
+              <p>
+                <strong>The light is real.</strong> The sun, the moon, and the hourly cloud cover all come from your location and the date, and the sky, the shadows under the cards, and the tint of the paper all read the same value: the time at the middle of the screen.
+              </p>
+            </Prose>
+            <Meta
+              className="mt-8"
+              items={[
+                ["Frontend", "React · TypeScript · Vite · GSAP · Lenis · SunCalc"],
+                ["Backend", "Supabase (Postgres, Auth, Storage, Edge Functions) · Vercel"],
+                ["Connects to", "Google Calendar · Google sign-in · Open-Meteo weather"],
+                ["Works on", "Computer and phone, each with its own layout"],
+                ["Link", <TextLink href={url}>Open the live site</TextLink>],
+              ]}
+            />
+          </div>
+          <div className="grid grid-cols-2 items-start gap-7 px-2 pb-6 md:px-0 xl:-mr-10 min-[1400px]:-mr-24">
+            <Figure
+              src={asset("scroll-phone-home.jpg")}
+              alt="The top of a day on a phone, at sunrise"
+              caption="A day opening on a phone, just as the sun comes up."
+              natural
+              variant="ornate"
+              className="-rotate-[2.5deg]"
+              seed={31}
+              onExpand={setExpanded}
+            />
+            <Figure
+              src={asset("scroll-phone-now.jpg")}
+              alt="Today on a phone, after dark"
+              caption="Today after dark, waiting at the now line."
+              natural
+              variant="ornate"
+              className="mt-[108%] rotate-[2deg]"
+              seed={37}
+              onExpand={setExpanded}
+            />
+          </div>
+        </div>
+        <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-3">
+          {[
+            ["Full-stack", "Frontend, database, accounts, photo storage, and a server function, deployed and live."],
+            ["Google Calendar", "Your real events, read-only, lined up with the hours of your day."],
+            ["Cloud sync", "Write on your computer, read it on your phone. Works offline first."],
+          ].map(([word, text]) => (
+            <div key={word} className="hairline pt-5">
+              <p className="font-display text-4xl font-light leading-none text-ink md:text-[2.6rem]">{word}</p>
+              <p className="mt-4 max-w-xs font-serif text-[15px] leading-relaxed text-graphite">{text}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <section className="hairline py-12 md:py-16">
+        <p className="font-display text-sm italic text-pencil">01</p>
+        <h2 className="font-display mb-8 mt-1 text-2xl font-normal leading-tight">Live</h2>
+        <LiveFrame
+          src={url}
+          title="Scroll Through a Day live preview"
+          caption="The deployed app. Scroll inside the frame to move through today; it works without an account, and entries stay in your browser."
+          heightClass="h-[560px] md:h-auto md:aspect-[16/10]"
+          allow="geolocation"
+          seed={132}
+        />
+      </section>
+
+      <Section n="02" title="Your calendar, inside your day">
+        <p className="font-display max-w-3xl text-3xl font-light leading-snug md:text-4xl">
+          Connect <span className="italic text-accent">Google Calendar</span> once, and every day arrives with its plans already in place.
+        </p>
+        <div className="mt-10 grid grid-cols-1 items-start gap-10 md:grid-cols-[3.4fr_1fr]">
+          <Figure
+            src={asset("scroll-desk-calendar.jpg")}
+            alt="Calendar events beside the day on a computer"
+            caption="On a computer, events run down the left of the hours, with your own notes under each one. (Sample events shown.)"
+            natural
+            seed={140}
+            onExpand={setExpanded}
+          />
+          <Figure
+            src={asset("scroll-phone-calendar.jpg")}
+            alt="Calendar events slid out on a phone"
+            caption="On a phone, swipe right to slide the events out."
+            natural
+            seed={141}
+            onExpand={setExpanded}
+          />
+        </div>
+        <div className="mt-10 grid grid-cols-1 gap-x-12 md:grid-cols-2">
+          <List
+            items={[
+              <><strong>Your real schedule.</strong> Events from Google Calendar sit in their own lane, each one as tall as the time it took, so you can see at a glance where the day went.</>,
+              <><strong>Read-only, on purpose.</strong> The app only asks Google for permission to read. It never edits, moves, or deletes anything on your calendar.</>,
+              <><strong>Notes on any event.</strong> Tap “add note” and jot bullets right on the meeting or the lunch they belong to.</>,
+            ]}
+          />
+          <List
+            items={[
+              <><strong>Notes that follow you.</strong> What you write on an event is saved to your account, so it is there on your phone and your computer.</>,
+              <><strong>All-day events up top.</strong> Birthdays and days off appear in the day’s header instead of crowding the hours.</>,
+              <><strong>Quiet by design.</strong> The calendar stays to the side in soft type. It gives the day structure, and the writing stays in the middle.</>,
+            ]}
+          />
+        </div>
+      </Section>
+
+      <Section n="03" title="How it works">
+        <Steps
+          items={[
+            {
+              n: "i",
+              title: "Scroll is time",
+              text: "Each day is a tall strip. The top is midnight, the bottom is the next midnight, and the clock in the corner shows the time at the middle of the screen as you move.",
+            },
+            {
+              n: "ii",
+              title: "Real light",
+              text: "SunCalc gives the sun and moon for your location and date. Sunrise, golden hour, sunset, dusk, the stars, and the moon’s phase all show up where they actually fall in your day.",
+            },
+            {
+              n: "iii",
+              title: "Real clouds",
+              text: "Hourly cloud cover, wind, rain, and snow come from Open-Meteo. Clouds drift with the wind as you scroll through the hours, and an overcast day greys the sky and softens the shadows.",
+            },
+            {
+              n: "iv",
+              title: "Space follows activity",
+              text: "Hours with entries expand and empty hours shrink, so a busy afternoon gets room and deep night becomes a short band of stars. The page is as long as the day was full.",
+            },
+            {
+              n: "v",
+              title: "Scrapbook photos",
+              text: "A photo lands at the moment you add it, taped to the page. You can slide it sideways, tilt it, and resize it, but it only moves a few minutes up or down, so it stays honest about when it happened.",
+            },
+            {
+              n: "vi",
+              title: "The month",
+              text: "Every day in the month view is a small weather scene for that day, with a mark for what you wrote. Clicking a day dives into it, and the cell grows into the full page.",
+            },
+          ]}
+        />
+      </Section>
+
+      <Section n="04" title="On a computer">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+          {dayDesk.map((shot, i) => (
+            <Figure key={shot.src} n={i + 1} {...shot} natural seed={60 + i} onExpand={setExpanded} />
+          ))}
+        </div>
+        <Figure
+          className="mt-10"
+          n={5}
+          src={asset("scroll-desk-month.jpg")}
+          alt="The month on a computer"
+          caption="The month. Each cell is that day’s weather; small marks show the days with notes and photos."
+          natural
+          seed={66}
+          onExpand={setExpanded}
+        />
+      </Section>
+
+      <Section n="05" title="On a phone">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+          {dayPhone.map((shot, i) => (
+            <Figure key={shot.src} n={i + 6} {...shot} natural seed={70 + i} onExpand={setExpanded} />
+          ))}
+        </div>
+        <Prose className="mt-10">
+          <p>
+            The phone is its own layout, not the computer one squeezed. Notes and photos share a single column in time order, calendar events slide out with a swipe to the right, the controls move to the bottom where a thumb can reach them, and the month flips like a wall calendar.
+          </p>
+        </Prose>
+      </Section>
+
+      <Section n="06" title="The full stack">
+        <Columns
+          items={[
+            {
+              title: "Works without an account",
+              text: "Everything is saved in the browser first, so the app opens instantly and works offline. Nothing asks you to sign up before you can write.",
+            },
+            {
+              title: "Sync when you want it",
+              text: "Signing in with email or Google keeps your days in step across devices through Supabase. The newest version of each entry wins, and photos upload in the background.",
+            },
+            {
+              title: "A real backend",
+              text: "Entries live in Postgres with row-level security, so each account can only read its own days. Photos go to private storage, and a server function handles the Google Calendar connection. The site deploys to Vercel on every push.",
+            },
+          ]}
+        />
+      </Section>
+
+      <Section n="07" title="What I learned">
+        <PullQuote>
+          A phone layout is a second design, not a smaller one. The hard part was changing the phone freely while keeping the computer exactly as it was.
+        </PullQuote>
+        <Prose>
+          <p>
+            Every phone change is scoped to touch devices rather than to narrow windows, so a small browser window on a laptop still gets the computer layout. Photo placement is even saved separately for each, so nudging a photo on the phone never moves it on the computer.
+          </p>
+        </Prose>
+      </Section>
+
+      <Lightbox image={expanded} onClose={() => setExpanded(null)} />
+    </Catalogue>
+  );
+}
+
 export function FaceStudy({ onClose }) {
   const [expanded, setExpanded] = useState(null);
   const url = "https://fifixu01.github.io/face-analyzer/";
   return (
     <Catalogue
-      number="01"
-      total="04"
+      number="02"
+      total="05"
       kind="Personal project · Computer vision"
       title="Face Analyzer"
       lede="A private, in-browser face analysis app. See how much you mog."
@@ -166,8 +437,8 @@ export function VizStudy({ onClose }) {
   const url = "https://fifixu01.github.io/ds4200FinalProject/";
   return (
     <Catalogue
-      number="04"
-      total="04"
+      number="05"
+      total="05"
       kind="Data visualization · DS4200"
       title="MBTA Data Visualization"
       lede="Exploring MBTA ridership through interactive visuals."
@@ -221,8 +492,8 @@ export function WebStudy({ onClose }) {
   const url = "https://spring26-project-spring26-project-group-sdc3.onrender.com/login";
   return (
     <Catalogue
-      number="03"
-      total="04"
+      number="04"
+      total="05"
       kind="Software engineering · Full-stack"
       title="GameNite"
       lede="A full-stack community and multiplayer game platform."
@@ -276,8 +547,8 @@ export function NbStudy({ onClose }) {
   const [expanded, setExpanded] = useState(null);
   return (
     <Catalogue
-      number="02"
-      total="04"
+      number="03"
+      total="05"
       kind="Internal hackathon · Notability onsite 2026"
       mark="★ 4th place overall"
       title="Notability on Your Wrist"

@@ -8,6 +8,7 @@ export const GROUND = 532; // where billboards and signs stand
 // `punch` is the shape the conductor's punch leaves in the ticket for that stop.
 export const STOPS = [
   { id: "home", kind: "station", label: "Home", name: "Fiora Xu Station", punch: "circle" },
+  { id: "day", kind: "project", label: "Day", name: "Scroll Through a Day", punch: "sun" },
   { id: "face", kind: "project", label: "Face", name: "Face Analyzer", punch: "heart" },
   { id: "nb", kind: "project", label: "Watch", name: "Notability on Your Wrist", punch: "clover" },
   { id: "web", kind: "project", label: "Games", name: "GameNite", punch: "diamond" },
@@ -46,4 +47,5 @@ export const BIRDS = [
   { ...perch(6, 0.55), n: 3 },
   { ...perch(8, 0.42), n: 2 },
   { ...perch(9, 0.7), n: 3 },
+  { ...perch(11, 0.38), n: 2 },
 ];

@@ -2,7 +2,15 @@ import { motion, useTransform } from "framer-motion";
 import { useTrain } from "./context.js";
 import { MAX, STOPS } from "./world.js";
 
+// a little sun: sixteen points, alternating long and short
+const SUN = `M${Array.from({ length: 16 }, (_, i) => {
+  const a = (i * Math.PI) / 8 - Math.PI / 2;
+  const r = i % 2 ? 4.9 : 8.2;
+  return `${(12 + Math.cos(a) * r).toFixed(2)},${(12 + Math.sin(a) * r).toFixed(2)}`;
+}).join(" L")} Z`;
+
 const SHAPES = {
+  sun: SUN,
   circle: "M12,5 a7,7 0 1 0 .01,0 Z",
   heart: "M12,19 C4,13 3,8 6.5,6 C9,4.8 11.4,6.4 12,8.4 C12.6,6.4 15,4.8 17.5,6 C21,8 20,13 12,19 Z",
   star: "M12,4 L14.2,9.4 L20,9.8 L15.6,13.6 L17,19.2 L12,16.2 L7,19.2 L8.4,13.6 L4,9.8 L9.8,9.4 Z",

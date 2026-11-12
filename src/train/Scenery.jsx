@@ -687,31 +687,32 @@ export function Landscape({ birdRefs, children }) {
   return (
     <>
       <Layer depth={0.06}>
-        <Balloon x={at(2.5, 0.06, 120)} y={90} />
+        <Balloon x={at(3.5, 0.06, 120)} y={90} />
       </Layer>
       <FarHills />
       <Layer depth={0.1}>
-        <Windmill x={at(1, 0.1, 400)} y={farB(at(1, 0.1, 400) % FAR_W) - 140} />
+        <Windmill x={at(2, 0.1, 400)} y={farB(at(2, 0.1, 400) % FAR_W) - 140} />
         <HillSign x={-314} y={352} />
       </Layer>
       <MidFields />
       <Layer depth={0.28}>
-        <Lake x={at(4.5, 0.28, 0)} y={452} />
+        <Lake x={at(5.5, 0.28, 0)} y={452} />
       </Layer>
       <Field />
       <Layer depth={0.55}>
-        <Boston x={at(4, 0.55, 40)} y={346} />
-        <TentAndBunting x={at(3, 0.55, 400)} y={372} />
-        <ClockTower x={at(2, 0.55, -370)} y={292} />
-        <Sheep x={at(3.5, 0.55, -60)} y={476} />
-        <Sheep x={at(3.5, 0.55, 150)} y={474} />
-        <Sheep x={at(1.5, 0.55, 90)} y={480} flip />
+        <Boston x={at(5, 0.55, 40)} y={346} />
+        <TentAndBunting x={at(4, 0.55, 400)} y={372} />
+        <ClockTower x={at(3, 0.55, -370)} y={292} />
+        <Sheep x={at(4.5, 0.55, -60)} y={476} />
+        <Sheep x={at(4.5, 0.55, 150)} y={474} />
+        <Sheep x={at(1.5, 0.55, -120)} y={478} />
+        <Sheep x={at(2.5, 0.55, 90)} y={480} flip />
       </Layer>
       <Ground />
       <Layer depth={1}>
         <Crossing x={GAP * 0.5} y={GROUND_Y - 142} />
-        <Scarecrow x={GAP * 1 - 430} y={GROUND_Y - 138} />
-        <TSign x={GAP * 4 + 330} y={GROUND_Y - 142} />
+        <Scarecrow x={GAP * 2 - 430} y={GROUND_Y - 138} />
+        <TSign x={GAP * 5 + 330} y={GROUND_Y - 142} />
       </Layer>
       {children}
       <Poles />

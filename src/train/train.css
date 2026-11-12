@@ -1042,7 +1042,7 @@
   position: absolute;
   right: calc(var(--win-l) + clamp(10px, 3vw, 60px));
   bottom: calc(var(--win-b) - 13vh);
-  width: clamp(296px, 26vw, 380px);
+  width: clamp(330px, 28vw, 410px);
   rotate: -3.5deg;
   filter: drop-shadow(0 2px 1px rgba(30, 26, 20, 0.3)) drop-shadow(0 10px 12px rgba(30, 26, 20, 0.22));
   transition: rotate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), translate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1094,20 +1094,20 @@
 .ticket-route ol {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
 }
 .ticket-route li { display: flex; justify-content: center; }
 .ticket-rail {
   position: absolute;
-  left: calc(12px + (100% - 24px) / 12);
-  width: calc((100% - 24px) * 10 / 12);
+  left: calc(12px + (100% - 24px) / 14);
+  width: calc((100% - 24px) * 12 / 14);
   top: 34px;
   height: 4px;
 }
 .ticket-train {
   position: absolute;
-  left: calc(12px + (100% - 24px) / 12);
-  width: calc((100% - 24px) * 10 / 12);
+  left: calc(12px + (100% - 24px) / 14);
+  width: calc((100% - 24px) * 12 / 14);
   top: 1px;
   pointer-events: none;
 }
@@ -1119,7 +1119,7 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  min-width: 44px;
+  min-width: 38px;
   padding: 0 2px 2px;
   cursor: var(--punch);
   color: #4a4640;
@@ -1130,7 +1130,7 @@
 .ticket-label {
   font-family: "Newsreader", serif;
   font-size: 10.5px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   line-height: 1.1;
 }
